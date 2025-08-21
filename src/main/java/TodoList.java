@@ -8,32 +8,32 @@ public class TodoList {
 
     public void add(ToDo task) {
         todoList.add(task);
-        Sid.SpecialPrint("Got it. I've added this task: \n  " + task + "\nNow you have " + todoList.size() + " tasks in the list");
+        Sid.SpecialPrint("Got it. I've added this task:\n  " + task + "\nNow you have " + todoList.size() + " tasks in the list.");
     }
 
-    public ToDo markDone(int id) throws NotFoundException {
+    public ToDo markDone(int id) throws SidException {
         // Convert to 0 based index
         int i = id - 1;
 
         if (i < 0 || i >= todoList.size()) {
-            throw new NotFoundException();
+            throw new SidException("Not a valid task number!");
         }
         ToDo t = todoList.get(i);
         t.markTask();
-        Sid.SpecialPrint(" YAY! You've completed this task:\n   " + t);
+        Sid.SpecialPrint("YAY! You've completed this task:\n  " + t);
         return t;
     }
 
-    public ToDo unmarkDone(int id) throws NotFoundException {
+    public ToDo unmarkDone(int id) throws SidException {
         // Convert to 0 based index
         int i = id - 1;
 
         if (i < 0 || i >= todoList.size()) {
-            throw new NotFoundException();
+            throw new SidException("Not a valid task number!");
         }
         ToDo t = todoList.get(i);
         t.unmarkTask();
-        Sid.SpecialPrint(" OK, I've marked this task as not done yet:\n   " + t);
+        Sid.SpecialPrint("OK, I've marked this task as not done yet:\n  " + t);
         return t;
     }
 
@@ -43,7 +43,7 @@ public class TodoList {
 
     @Override
     public String toString() {
-        String output = "Here are your tasks: \n";
+        String output = "Here are your tasks:\n";
         for (int i = 0; i < todoList.size(); i++) {
             output += (i+1) + ". " +  todoList.get(i);
             if (i < todoList.size() - 1) {

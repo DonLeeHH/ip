@@ -7,7 +7,7 @@ public class Sid {
     public static void main(String[] args) {
         try (Scanner sc = new Scanner(System.in)) {
             // greeting
-            SpecialPrint("Hello! I'm Sid \nWhat can I do for you?");
+            SpecialPrint("Hello! I'm Sid\nWhat can I do for you?");
 
             while (running) {
                 if (!sc.hasNextLine()) break;           // handle EOF (Ctrl+D/Ctrl+Z)
@@ -28,7 +28,7 @@ public class Sid {
                         break;
                     case "todo":
                         if (arg.isEmpty()) {
-                            SpecialPrint(" OOPS!!! The description of a todo cannot be empty.");
+                            SpecialPrint(" Usage: todo <description>");
                             break;
                         }
                         todoList.add(new ToDo(arg));
@@ -92,13 +92,14 @@ public class Sid {
                                     ? todoList.markDone(id)
                                     : todoList.unmarkDone(id);
 
-                        } catch (NotFoundException e) {
-                            SpecialPrint(" Invalid task number: " + arg);
+                        } catch (SidException e) {
+
                         }
                         break;
                     }
                     default:
                         // ... other commands
+                        SpecialPrint("OOPSS!!! I DON'T UNDERSTAND YOUU, GO TO README");
                         break;
                 }
             }
