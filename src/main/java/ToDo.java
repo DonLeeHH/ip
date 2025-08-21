@@ -1,8 +1,9 @@
-public class Task {
-    protected String description;
-    protected boolean isDone;
+public class ToDo {
+    private String description;
+    private boolean isDone;
+    protected char type = 'T';
 
-    public Task(String description) {
+    public ToDo(String description) {
         this.description = description;
         this.isDone = false;
     }
@@ -17,6 +18,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "[" + (isDone ? "X" : " ") + "] " + description;
+        return "[" + this.type + "][" + (isDone ? "X" : " ") + "] " + description;
     }
 }
