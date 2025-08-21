@@ -2,16 +2,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Sid {
-    private static final String HR = "_".repeat(60);
-    private static ArrayList<String> todoList = new ArrayList<>();
+    public static final String HR = "_".repeat(60);
+    private static TodoList todoList= new TodoList();
 
     public static void main(String[] args) {
         try (Scanner sc = new Scanner(System.in)) {
             // greeting
-            System.out.println(HR);
-            System.out.println(" Hello! I'm Sid");
-            System.out.println(" What can I do for you?");
-            System.out.println(HR);
+            SpecialPrint("Hello! I'm Sid \nWhat can I do for you?");
 
             while (true) {
                 if (!sc.hasNextLine()) break;           // handle EOF (Ctrl+D/Ctrl+Z)
@@ -19,24 +16,35 @@ public class Sid {
                 String cmd = raw.trim();                 // remove whitespaces from both ends
 
                 if (cmd.equalsIgnoreCase("bye")) {
-                    System.out.println(HR);
-                    System.out.println(" ByeByeBye");
-                    System.out.println(HR);
+                    SpecialPrint("ByeByeBye");
                     break;
                 }
                 else if (cmd.equalsIgnoreCase("list")) {
-                    System.out.println(HR);
-                    for (int i = 0; i < todoList.size(); i++) {
-                        System.out.println((i+1) + ". " +  todoList.get(i));
+                    System.out.println(todoList);
+                } else if (cmd.toLowerCase().startsWith("mark ") || cmd.toLowerCase().startsWith("unmark ")) {
+                    String[] parts = cmd.split("\\s+"); // Split the input on one-or-more spaces
+                    if (parts.length == 2) {
+                        try {
+                            int id = Integer.parseInt(parts[1]);
+                            boolean isMark = parts[0].equalsIgnoreCase("mark");
+                            if (isMark) todoList.markDone(id); else todoList.unmarkDone(id); // toggle the task
+                        } catch (NumberFormatException e) {
+                            // The second token wasn't a valid integer (e.g., "mark two")
+                            SpecialPrint(" Please provide a valid number after 'mark'/'unmark'.");
+                        } catch (NotFoundException e) {
+                            SpecialPrint(" Item index not found in Todo list");
+                        }
                     }
-                    System.out.println(HR);
                 } else {
-                    todoList.add(cmd);
-                    System.out.println(HR);
-                    System.out.println("added: " + raw);
-                    System.out.println(HR);
+                    todoList.add(new Task(cmd));
+                    SpecialPrint("added:" + raw);
                 }
             }
         }
+    }
+    public static void SpecialPrint(String message){
+        System.out.println(HR);
+        System.out.println(message);
+        System.out.println(HR);
     }
 }
