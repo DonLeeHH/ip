@@ -1,13 +1,12 @@
 import java.util.Scanner;
 
 public class Sid {
-    public static final String HR = "_".repeat(60);
     private static TodoList todoList= new TodoList();
     private static boolean running = true;
     public static void main(String[] args) {
         try (Scanner sc = new Scanner(System.in)) {
             // greeting
-            SpecialPrint("Hello! I'm Sid\nWhat can I do for you?");
+            SpecialPrint(SidMsg.GREETING);
 
             while (running) {
                 try {
@@ -21,7 +20,7 @@ public class Sid {
 
                     switch (cmd) {
                         case "bye":
-                            SpecialPrint("ByeByeBye");
+                            SpecialPrint(SidMsg.GOODBYE);
                             running = false;
                             break;
                         case "list":
@@ -106,9 +105,14 @@ public class Sid {
             }
         }
     }
-    public static void SpecialPrint(String message){
-        System.out.println(HR);
-        System.out.println(message);
-        System.out.println(HR);
+    public static void SpecialPrint(String msg){
+        System.out.println(SidMsg.HR);
+        System.out.println(msg);
+        System.out.println(SidMsg.HR);
+    }
+    public static void SpecialPrint(SidMsg SIDMSG){
+        System.out.println(SidMsg.HR);
+        System.out.println(SIDMSG);
+        System.out.println(SidMsg.HR);
     }
 }
