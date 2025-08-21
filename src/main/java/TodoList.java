@@ -15,7 +15,7 @@ public class TodoList {
         // Convert to 0 based index
         int i = id - 1;
 
-        if (i < 0 || i >= todoList.size()) {
+        if (i < 0 || i >= this.size()) {
             throw new SidException("Not a valid task number!");
         }
         ToDo t = todoList.get(i);
@@ -28,7 +28,7 @@ public class TodoList {
         // Convert to 0 based index
         int i = id - 1;
 
-        if (i < 0 || i >= todoList.size()) {
+        if (i < 0 || i >= this.size()) {
             throw new SidException("Not a valid task number!");
         }
         ToDo t = todoList.get(i);
@@ -39,6 +39,15 @@ public class TodoList {
 
     public int size() {
         return todoList.size();
+    }
+
+    public void delete(int id) throws SidException {
+        int i = id - 1;
+        if (i < 0 || i >= this.size()) {
+            throw new SidException("Not a valid task number!");
+        }
+        ToDo deletedTask = todoList.remove(i);
+        Sid.SpecialPrint("Successfully deleted this task:\n  " + deletedTask + "\nNow you have " + todoList.size() + " tasks in the list.");
     }
 
     @Override

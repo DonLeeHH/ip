@@ -82,6 +82,19 @@ public class Sid {
                             ToDo updated = cmd.equals("mark") ? todoList.markDone(id) : todoList.unmarkDone(id);
                             break;
                         }
+                        case "delete": {
+                            if (arg.isEmpty()) {
+                                throw new SidException("Usage: " + cmd + " <task-number>");
+                            }
+                            int id;
+                            try {
+                                id = Integer.parseInt(arg); // 1-based index
+                            } catch (NumberFormatException e) {
+                                throw new SidException("Please provide a valid number after 'mark'/'unmark'.");
+                            }
+                            todoList.delete(id);
+                            break;
+                        }
                         default:
                             // ... other commands
                             throw new SidException("OOPSS!!! I DON'T UNDERSTAND YOUU, GO TO README");
