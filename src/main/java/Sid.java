@@ -1,7 +1,9 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Sid {
     private static final String HR = "_".repeat(60);
+    private static ArrayList<String> todoList = new ArrayList<>();
 
     public static void main(String[] args) {
         try (Scanner sc = new Scanner(System.in)) {
@@ -22,10 +24,18 @@ public class Sid {
                     System.out.println(HR);
                     break;
                 }
-
-                System.out.println(HR);
-                System.out.println(" " + raw);
-                System.out.println(HR);
+                else if (cmd.equalsIgnoreCase("list")) {
+                    System.out.println(HR);
+                    for (int i = 0; i < todoList.size(); i++) {
+                        System.out.println((i+1) + ". " +  todoList.get(i));
+                    }
+                    System.out.println(HR);
+                } else {
+                    todoList.add(cmd);
+                    System.out.println(HR);
+                    System.out.println("added: " + raw);
+                    System.out.println(HR);
+                }
             }
         }
     }
