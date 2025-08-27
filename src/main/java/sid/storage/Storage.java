@@ -95,8 +95,8 @@ public class Storage {
         }
 
         try (FileWriter fw = new FileWriter(this.file, false)) { // overwrite mode
-            for (int i = 0; i < list.getSize(); i++) {
-                ToDo t = list.getTodo(i);
+            for (int i = 0; i < list.getSize() - 1; i++) {
+                ToDo t = list.getTodo(i + 1);
                 fw.write(serializeTodo(t));
                 fw.write(System.lineSeparator());
             }
