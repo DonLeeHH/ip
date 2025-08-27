@@ -48,7 +48,6 @@ public class TodoList {
         ToDo t = todoList.get(i);
         t.markTask();
         storage.save(this);
-        Sid.SpecialPrint("YAY! You've completed this task:\n  " + t);
         return t;
     }
 
@@ -69,7 +68,6 @@ public class TodoList {
         ToDo t = this.todoList.get(i);
         t.unmarkTask();
         storage.save(this);
-        Sid.SpecialPrint("OK, I've marked this task as not done yet:\n  " + t);
         return t;
     }
 
@@ -80,7 +78,6 @@ public class TodoList {
     public void add(ToDo task) {
         todoList.add(task);
         storage.save(this);
-        Sid.SpecialPrint("Got it. I've added this task:\n  " + task + "\nNow you have " + todoList.size() + " tasks in the list.");
     }
 
     public void delete(int id) throws SidException {
@@ -90,20 +87,18 @@ public class TodoList {
         }
         ToDo deletedTask = this.todoList.remove(i);
         storage.save(this);
-        Sid.SpecialPrint("Successfully deleted this task:\n  " + deletedTask + "\nNow you have " + this.todoList.size() + " tasks in the list.");
     }
 
     /**
      * Returns the task at the given zero-based index.
      *
-     * <p>Note: This method uses a <em>zero-based</em> index for programmatic access, which differs
-     * from the 1-based indices shown to users in messages and {@link #toString()}.
-     *
-     * @param id Zero-based position in the internal list.
+     * @param id One-based position in the internal list.
      * @return The task at the specified position.
      * @throws SidException If {@code id} is out of range.
      */
     public ToDo getTodo(int id) throws SidException {
+        // For one-based indexing
+        id -= 1;
         if  (id < 0 || id >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         } else {
