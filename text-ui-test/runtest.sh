@@ -16,7 +16,7 @@ fi
 [ -e "./ACTUAL.TXT" ] && rm ACTUAL.TXT
 
 # compile the code into the bin folder, terminate if error occurred
-if ! javac -cp ../src/main/java -Xlint:none -d ../bin ../src/main/java/*.java; then
+if ! javac -cp ../src/main/java -Xlint:none -d ../bin ../src/main/java/sid/*.java; then
   printf "%s%s********** BUILD FAILURE **********%s\n" "$RED" "$BOLD" "$RESET"
   exit 1
 fi
