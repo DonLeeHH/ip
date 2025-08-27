@@ -1,3 +1,5 @@
+package sid.enums;
+
 public enum SidMsg {
     HR("_".repeat(60)),
     GREETING("Hello! I'm Sid\nWhat can I do for you?"),

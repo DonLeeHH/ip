@@ -1,4 +1,6 @@
-public class Deadline extends ToDo{
+package sid.models;
+
+public class Deadline extends ToDo {
     private String dueDate;
 
     public Deadline(String description, String dueDate) {

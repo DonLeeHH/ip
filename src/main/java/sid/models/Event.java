@@ -1,4 +1,6 @@
-public class Event extends ToDo{
+package sid.models;
+
+public class Event extends ToDo {
     String startDate;
     String endDate;
     public Event(String description, String startDate, String dueDate) {

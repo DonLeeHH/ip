@@ -1,3 +1,8 @@
+package sid.models;
+
+import sid.Sid;
+import sid.exceptions.SidException;
+
 import java.util.ArrayList;
 
 public class TodoList {

@@ -1,3 +1,12 @@
+package sid;
+
+import sid.enums.SidMsg;
+import sid.exceptions.SidException;
+import sid.models.Deadline;
+import sid.models.Event;
+import sid.models.ToDo;
+import sid.models.TodoList;
+
 import java.util.Scanner;
 
 public class Sid {
