@@ -8,6 +8,11 @@ import sid.models.ToDo;
 import sid.models.TodoList;
 import sid.storage.Storage;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 /**
@@ -64,35 +69,31 @@ public class Sid {
                         break;
                     case "deadline":
                         if (arg.isEmpty()) {
-                            throw new SidException("Usage: deadline <description> /by <when>");
+                            throw new SidException("Usage: deadline <description> /by <yyyy-MM-dd HHmm>");
                         }
-                        // split on "/by" with optional spaces around it, only once
                         String[] seg = arg.split("\\s*/by\\s+", 2);
                         if (seg.length < 2 || seg[0].isBlank() || seg[1].isBlank()) {
-                            throw new SidException("Usage: deadline <description> /by <when>");
+                            throw new SidException("Usage: deadline <description> /by <yyyy-MM-dd HHmm>");
                         }
                         String deadline_desc = seg[0].trim();
-                        String when = seg[1].trim();
+                        LocalDateTime when = parseFlexibleDateTime(seg[1].trim());
                         todoList.add(new Deadline(deadline_desc, when, false));
                         break;
                     case "event":
                         if (arg.isEmpty()) {
-                            throw new SidException("Usage: event <description> /from <start> /to <end>");
+                            throw new SidException("Usage: event <description> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>");
                         }
-                        // Split on "/from", then on "/to" (case-insensitive, tolerate extra spaces)
                         String[] a = arg.split("(?i)\\s*/from\\s+", 2);
                         if (a.length < 2 || a[0].isBlank()) {
-                            throw new SidException("Usage: event <description> /from <start> /to <end>");
+                            throw new SidException("Usage: event <description> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>");
                         }
                         String desc = a[0].trim();
-
                         String[] b = a[1].split("(?i)\\s*/to\\s+", 2);
                         if (b.length < 2 || b[0].isBlank() || b[1].isBlank()) {
-                            throw new SidException("Usage: event <description> /from <start> /to <end>");
+                            throw new SidException("Usage: event <description> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>");
                         }
-                        String start = b[0].trim();
-                        String end = b[1].trim();
-
+                        LocalDateTime start = parseFlexibleDateTime(b[0].trim());
+                        LocalDateTime end = parseFlexibleDateTime(b[1].trim());
                         Event event = new Event(desc, start, end, false);
                         todoList.add(event);
                         break;
@@ -119,23 +120,20 @@ public class Sid {
                         try {
                             id = Integer.parseInt(arg); // 1-based index
                         } catch (NumberFormatException e) {
-                            throw new SidException("Please provide a valid number after 'mark'/'unmark'.");
+                            throw new SidException("Please provide a valid number after 'delete'.");
                         }
                         todoList.delete(id);
                         break;
                     }
                     default:
-                        // ... other commands
                         throw new SidException("OOPSS!!! I DON'T UNDERSTAND YOUU, GO TO README");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    SpecialPrint(e.getMessage());
                 }
-
             }
         }
     }
-
     /**
      * Prints a plain string message framed by a horizontal rule.
      *
@@ -160,5 +158,53 @@ public class Sid {
         System.out.println(SidMsg.HR);
         System.out.println(SIDMSG);
         System.out.println(SidMsg.HR);
+    }
+
+    /**
+     * Parses flexible date/time strings.
+     *
+     * <p>Accepted patterns (examples):
+     * <ul>
+     *   <li>{@code yyyy-MM-dd HHmm}  →  {@code 2019-12-02 1800}</li>
+     *   <li>{@code yyyy-MM-dd}       →  {@code 2019-12-02}</li>
+     *   <li>{@code d/M/yyyy HHmm}    →  {@code 2/12/2019 1800}</li>
+     *   <li>{@code d/M/yyyy}         →  {@code 2/12/2019}</li>
+     * </ul>
+     * If only a date is supplied, time defaults to 00:00.
+     *
+     * @param text Input text to parse.
+     * @return Parsed {@link LocalDateTime}.
+     * @throws SidException If parsing fails for all supported patterns.
+     */
+    private static LocalDateTime parseFlexibleDateTime(String text) throws SidException {
+        // Try date+time first
+        DateTimeFormatter[] dateTimePatterns = new DateTimeFormatter[] {
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
+                DateTimeFormatter.ofPattern("d/M/yyyy HHmm")
+        };
+        for (DateTimeFormatter f : dateTimePatterns) {
+            try {
+                return LocalDateTime.parse(text, f);
+            } catch (DateTimeParseException ignore) {
+                /* try next */
+            }
+        }
+
+        // Try date-only, default to 00:00
+        DateTimeFormatter[] dateOnlyPatterns = new DateTimeFormatter[] {
+                DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+                DateTimeFormatter.ofPattern("d/M/yyyy")
+        };
+        for (DateTimeFormatter f : dateOnlyPatterns) {
+            try {
+                LocalDate d = LocalDate.parse(text, f);
+                return LocalDateTime.of(d, LocalTime.MIDNIGHT);
+            } catch (DateTimeParseException ignore) {
+                /* try next */
+            }
+        }
+
+        throw new SidException("Could not parse date/time: " + text +
+                "\nTry formats like: 2025-12-02 1800 or 2/12/2025 1800");
     }
 }

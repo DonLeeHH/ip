@@ -1,5 +1,8 @@
 package sid.models;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import sid.enums.TaskType;
 
 /**
@@ -10,34 +13,43 @@ import sid.enums.TaskType;
  * are free-form strings used for display and persistence (e.g., {@code "Aug 6th 2pm"}).
  */
 public class Event extends ToDo {
-    String startDate;
-    String endDate;
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("MMM dd yyyy");
+    private static final DateTimeFormatter DATE_TIME_FMT = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
+
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     /**
-     * Constructs an event task with the given description, start time, end time, and completion state.
+     * Constructs an event task.
      *
-     * @param description Human-readable description of the event.
-     * @param startDate   Start time label (e.g., {@code "Aug 6th 2pm"}).
-     * @param dueDate     End time label (stored as {@code endDate}); the parameter name is kept for compatibility.
-     * @param isDone      Whether the task is already marked as completed.
+     * @param description Description of the event.
+     * @param startDate   Start date/time.
+     * @param endDate     End date/time.
+     * @param isDone      Completion flag.
      */
-    public Event(String description, String startDate, String dueDate, boolean isDone) {
+    public Event(String description, LocalDateTime startDate, LocalDateTime endDate, boolean isDone) {
         super(description, isDone);
         this.type = TaskType.EVENT;
         this.startDate = startDate;
-        this.endDate = dueDate;
+        this.endDate = endDate;
     }
 
-    public String getStartDate() {
+    public LocalDateTime getStartDate() {
         return this.startDate;
     }
 
-    public String getEndDate() {
+    public LocalDateTime getEndDate() {
         return this.endDate;
+    }
+
+    private static String format(LocalDateTime dt) {
+        return (dt.getHour() == 0 && dt.getMinute() == 0)
+                ? dt.toLocalDate().format(DATE_FMT)
+                : dt.format(DATE_TIME_FMT);
     }
 
     @Override
     public String toString() {
-        return super.toString() + " (from: " + this.startDate + ", to: " + this.endDate + ")";
+        return super.toString() + " (from: " + format(this.startDate) + ", to: " + format(this.endDate) + ")";
     }
 }
