@@ -2,68 +2,124 @@ package sid.models;
 
 import sid.Sid;
 import sid.exceptions.SidException;
+import sid.storage.Storage;
 
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Holds an in-memory list of tasks and provides user-facing operations.
+ *
+ * <p>All mutating operations ({@code add}, {@code delete}, {@code markDone}, {@code unmarkDone})
+ * automatically persist the updated list via the injected {@link Storage} and also print a
+ * formatted confirmation using {@link Sid#SpecialPrint(String)}.
+ *
+ * <p>Unless stated otherwise, user-facing task indices are 1-based (as shown in {@link #toString()}).
+ */
 public class TodoList {
-    private ArrayList<ToDo> todoList;
-    public TodoList() {
-        todoList = new ArrayList<>();
+    private final ArrayList<ToDo> todoList;
+    private final Storage storage;
+
+    /**
+     * Constructs a task list initialized with the given tasks and bound storage.
+     *
+     * @param initialList Initial tasks to populate the list with.
+     * @param storage     Storage used to persist changes after mutations.
+     */
+    public TodoList(List<ToDo> initialList, Storage storage) {
+        this.todoList = new ArrayList<>(initialList);
+        this.storage = storage;
     }
 
-    public void add(ToDo task) {
-        todoList.add(task);
-        Sid.SpecialPrint("Got it. I've added this task:\n  " + task + "\nNow you have " + todoList.size() + " tasks in the list.");
-    }
-
+    /**
+     * Marks the specified task as done (1-based index), saves, and prints a confirmation.
+     *
+     * @param id 1-based task number as displayed to the user.
+     * @return The task that was marked as done.
+     * @throws SidException If {@code id} is out of range.
+     */
     public ToDo markDone(int id) throws SidException {
         // Convert to 0 based index
         int i = id - 1;
 
-        if (i < 0 || i >= this.size()) {
+        if (i < 0 || i >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         }
         ToDo t = todoList.get(i);
         t.markTask();
+        storage.save(this);
         Sid.SpecialPrint("YAY! You've completed this task:\n  " + t);
         return t;
     }
 
+    /**
+     * Marks the specified task as not done yet (1-based index), saves, and prints a confirmation.
+     *
+     * @param id 1-based task number as displayed to the user.
+     * @return The task that was unmarked.
+     * @throws SidException If {@code id} is out of range.
+     */
     public ToDo unmarkDone(int id) throws SidException {
         // Convert to 0 based index
         int i = id - 1;
 
-        if (i < 0 || i >= this.size()) {
+        if (i < 0 || i >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         }
-        ToDo t = todoList.get(i);
+        ToDo t = this.todoList.get(i);
         t.unmarkTask();
+        storage.save(this);
         Sid.SpecialPrint("OK, I've marked this task as not done yet:\n  " + t);
         return t;
     }
 
-    public int size() {
-        return todoList.size();
+    public int getSize() {
+        return this.todoList.size();
+    }
+
+    public void add(ToDo task) {
+        todoList.add(task);
+        storage.save(this);
+        Sid.SpecialPrint("Got it. I've added this task:\n  " + task + "\nNow you have " + todoList.size() + " tasks in the list.");
     }
 
     public void delete(int id) throws SidException {
         int i = id - 1;
-        if (i < 0 || i >= this.size()) {
+        if (i < 0 || i >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         }
-        ToDo deletedTask = todoList.remove(i);
-        Sid.SpecialPrint("Successfully deleted this task:\n  " + deletedTask + "\nNow you have " + todoList.size() + " tasks in the list.");
+        ToDo deletedTask = this.todoList.remove(i);
+        storage.save(this);
+        Sid.SpecialPrint("Successfully deleted this task:\n  " + deletedTask + "\nNow you have " + this.todoList.size() + " tasks in the list.");
+    }
+
+    /**
+     * Returns the task at the given zero-based index.
+     *
+     * <p>Note: This method uses a <em>zero-based</em> index for programmatic access, which differs
+     * from the 1-based indices shown to users in messages and {@link #toString()}.
+     *
+     * @param id Zero-based position in the internal list.
+     * @return The task at the specified position.
+     * @throws SidException If {@code id} is out of range.
+     */
+    public ToDo getTodo(int id) throws SidException {
+        if  (id < 0 || id >= this.getSize()) {
+            throw new SidException("Not a valid task number!");
+        } else {
+            return this.todoList.get(id);
+        }
     }
 
     @Override
     public String toString() {
-        String output = "Here are your tasks:\n";
-        for (int i = 0; i < todoList.size(); i++) {
-            output += (i+1) + ". " +  todoList.get(i);
-            if (i < todoList.size() - 1) {
-                output += "\n";
+        StringBuilder output = new StringBuilder("Here are your tasks:\n");
+        for (int i = 0; i < this.todoList.size(); i++) {
+            output.append((i + 1)).append(". ").append(this.todoList.get(i));
+            if (i < this.todoList.size() - 1) {
+                output.append("\n");
             }
         }
-        return output;
+        return output.toString();
     }
 }
