@@ -1,40 +1,52 @@
 package sid.models;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import sid.enums.TaskType;
 
 /**
- * Represents a task with a due date that must be completed by a specified time.
+ * Represents a task with a due date/time.
  *
- * <p>A {@code Deadline} is a specialized {@link ToDo} whose type is {@link TaskType#DEADLINE}
- * and which carries an additional {@code dueDate} string used for display and persistence.
+ * <p>Stores a {@link LocalDateTime} and formats it for display as
+ * {@code "MMM dd yyyy"} or {@code "MMM dd yyyy HH:mm"} when time is present.
  */
 public class Deadline extends ToDo {
-    private String dueDate;
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("MMM dd yyyy");
+    private static final DateTimeFormatter DATE_TIME_FMT = DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm");
+
+    private LocalDateTime dueDate;
 
     /**
-     * Constructs a deadline task with the given description, due date, and completion state.
+     * Constructs a deadline task.
      *
-     * @param description Human-readable description of the task.
-     * @param dueDate Due date/time label (free-form text such as {@code "June 6th"}).
-     * @param isDone Whether the task is already marked as completed.
+     * @param description Description of the task.
+     * @param dueDate     Due date/time.
+     * @param isDone      Completion flag.
      */
-    public Deadline(String description, String dueDate, boolean isDone) {
+    public Deadline(String description, LocalDateTime dueDate, boolean isDone) {
         super(description, isDone);
         this.dueDate = dueDate;
         this.type = TaskType.DEADLINE;
     }
 
     /**
-     * Returns the due date label of this deadline task.
+     * Returns the due date/time.
      *
-     * @return Due date/time as a string.
+     * @return Due date/time.
      */
-    public String getDueDate() {
+    public LocalDateTime getDueDate() {
         return this.dueDate;
+    }
+
+    private static String format(LocalDateTime dt) {
+        return (dt.getHour() == 0 && dt.getMinute() == 0)
+                ? dt.toLocalDate().format(DATE_FMT)
+                : dt.format(DATE_TIME_FMT);
     }
 
     @Override
     public String toString() {
-        return super.toString() + " (by: " + this.dueDate + ")";
+        return super.toString() + " (by: " + format(this.dueDate) + ")";
     }
 }

@@ -11,30 +11,41 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 /**
- * Persists and retrieves tasks using a simple pipe-separated flat file.
+ * Persists and retrieves tasks in a pipe-separated flat file.
  *
- * <p>Each task occupies one line with optional whitespace around {@code |}. Examples:
+ * <p>Each record occupies one line; optional whitespace is allowed around
+ * the {@code |} separators. The second field is a done flag
+ * ({@code 1} = done, {@code 0} = not done).
+ *
+ * <p>Level 8 dates/times are stored in ISO-8601 {@code LocalDateTime} format
+ * (e.g., {@code 2019-12-02T18:00}) for unambiguous parsing. Examples:
  * <pre>
  * T | 1 | read book
- * D | 0 | return book | June 6th
- * E | 0 | project meeting | Aug 6th 2pm | Aug 6th 4pm
+ * D | 0 | return book | 2019-12-02T18:00
+ * E | 0 | project meeting | 2019-08-06T14:00 | 2019-08-06T16:00
  * </pre>
- * The second field is a done flag ({@code 1} = done, {@code 0} = not done).
- * Missing files are handled gracefully on load; malformed lines are skipped and logged to {@code System.err}.
+ *
+ * <p>On load, a missing file is treated as empty; malformed lines are skipped
+ * with a warning to {@code System.err}. On save, the parent directory is
+ * created if it does not exist.
  */
+
 public class Storage {
+    private static final DateTimeFormatter ISO_DT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
     private final File file;
 
-    // Include JavaDoc later
     /**
      * Constructs a storage backed by the specified file path.
      *
-     * @param relativePath Path to the save file (e.g., {@code data/duke.txt}); may be relative or absolute.
+     * @param relativePath Path to save file (e.g., {@code data/sid.txt}).
      */
     public Storage(String relativePath) {
         this.file = new File(relativePath);
@@ -75,13 +86,7 @@ public class Storage {
         return new TodoList(initialList, this);
     }
 
-    /**
-     * Saves the entire task list to disk, overwriting any existing content.
-     *
-     * <p>The parent directory (e.g., {@code ./data}) is created if missing. Any serialization problems are logged.
-     *
-     * @param list The task list to persist.
-     */
+    /** Saves the entire TodoList. Creates parent folder (e.g. ./data) when needed. */
     public void save(TodoList list) {
         // Ensure ./data exists
         File parent = this.file.getParentFile();
@@ -91,7 +96,7 @@ public class Storage {
 
         try (FileWriter fw = new FileWriter(this.file, false)) { // overwrite mode
             for (int i = 0; i < list.getSize(); i++) {
-                ToDo t = list.getTodo(i); // 1-based like your public API
+                ToDo t = list.getTodo(i);
                 fw.write(serializeTodo(t));
                 fw.write(System.lineSeparator());
             }
@@ -107,14 +112,16 @@ public class Storage {
         if (t instanceof Deadline) {
             Deadline deadline = (Deadline) t;
             type = TaskType.DEADLINE;
-            extra = deadline.getDueDate();
+            extra = deadline.getDueDate().format(ISO_DT);
 
         } else if (t instanceof Event) {
             Event event = (Event) t;
             type = TaskType.EVENT;
-            extra = event.getStartDate() + " | " + event.getEndDate();
+            extra = event.getStartDate().format(ISO_DT) + " | " + event.getEndDate().format(ISO_DT);
+
         } else if (t instanceof ToDo) {
             type = TaskType.TODO;
+
         } else {
             throw new SidException("Unknown task type: " + t.getClass().getName());
         }
@@ -124,9 +131,15 @@ public class Storage {
         return extra.isEmpty() ? base : base + " | " + extra;
     }
 
-    /** Parses a line back into a ToDo. Accepts:
-     *   "T | 1 | description"
-     *   "T | 0 | description"
+    /**
+     * Parses a line into a task instance.
+     *
+     * <p>Expected formats (ISO date-times for D/E):
+     * <pre>
+     * T | 0|1 | description
+     * D | 0|1 | description | 2019-12-02T18:00
+     * E | 0|1 | description | 2019-12-02T18:00 | 2019-12-02T20:00
+     * </pre>
      */
     private ToDo deserializeToDo(String line) throws SidException {
         String[] parts = line.split("\\s*\\|\\s*");
@@ -151,7 +164,7 @@ public class Storage {
             if (parts.length < 4) {
                 throw new SidException("Deadline missing 'by' field");
             }
-            String by = parts[3];
+            LocalDateTime by = LocalDateTime.parse(parts[3].trim(), ISO_DT);
             task = new Deadline(description, by, isDone);
             break;
 
@@ -159,8 +172,8 @@ public class Storage {
             if (parts.length < 5) {
                 throw new SidException("Event missing start/end fields");
             }
-            String start = parts[3];
-            String end = parts[4];
+            LocalDateTime start = LocalDateTime.parse(parts[3].trim(), ISO_DT);
+            LocalDateTime end = LocalDateTime.parse(parts[4].trim(), ISO_DT);
             task = new Event(description, start, end, isDone);
             break;
 

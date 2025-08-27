@@ -1,5 +1,5 @@
-T | 0 | Test
-D | 1 | this is a deadline | 10pm
-T | 1 | something to do
-D | 0 | a deadline to finish | 3pm
-E | 0 | an event to attend | 2pm | 12am
+T | 0 | something
+D | 0 | a deaedline | 2025-08-30T18:00:00
+D | 1 | something deadline | 2025-09-01T19:00:00
+E | 0 | an event | 2025-08-30T18:00:00 | 2025-09-03T18:00:00
+E | 0 | another event | 2025-12-02T00:00:00 | 2025-12-03T00:00:00

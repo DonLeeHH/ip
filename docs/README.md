@@ -1,4 +1,4 @@
-# sid.Sid User Guide
+# Sid User Guide
 
 // Update the title above to match the actual product name
 
