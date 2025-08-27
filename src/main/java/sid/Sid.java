@@ -1,6 +1,5 @@
 package sid;
 
-import sid.enums.SidMsg;
 import sid.exceptions.SidException;
 import sid.models.TodoList;
 import sid.parser.Parser;

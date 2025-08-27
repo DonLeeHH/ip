@@ -4,36 +4,104 @@ What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [T][ ] borrow book
+  [T][ ] something
 Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] return book (by: Sunday)
+  [D][ ] a deadline (by: Aug 30 2025 18:00)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Mon 2pm, to: 4pm)
+  [D][ ] another deadline (by: Jan 09 2025 20:00)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-YAY! You've completed this task:
-  [T][X] borrow book
+Got it. I've added this task:
+  [D][ ] last deadline (by: Dec 30 2025)
+Now you have 4 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-YAY! You've completed this task:
-  [D][X] return book (by: Sunday)
+Got it. I've added this task:
+  [E][ ] an event (from: Aug 30 2025 18:00, to: Aug 30 2025 20:00)
+Now you have 5 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-OK, I've marked this task as not done yet:
-  [D][ ] return book (by: Sunday)
+Got it. I've added this task:
+  [E][ ] another event (from: Sep 01 2025, to: Sep 02 2025)
+Now you have 6 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are your tasks:
-1. [T][X] borrow book
-2. [D][ ] return book (by: Sunday)
-3. [E][ ] project meeting (from: Mon 2pm, to: 4pm)
+1. [T][ ] something
+2. [D][ ] a deadline (by: Aug 30 2025 18:00)
+3. [D][ ] another deadline (by: Jan 09 2025 20:00)
+4. [D][ ] last deadline (by: Dec 30 2025)
+5. [E][ ] an event (from: Aug 30 2025 18:00, to: Aug 30 2025 20:00)
+6. [E][ ] another event (from: Sep 01 2025, to: Sep 02 2025)
+____________________________________________________________
+____________________________________________________________
+YAY! You've completed this task:
+  [D][X] a deadline (by: Aug 30 2025 18:00)
+____________________________________________________________
+____________________________________________________________
+YAY! You've completed this task:
+  [D][X] last deadline (by: Dec 30 2025)
+____________________________________________________________
+____________________________________________________________
+YAY! You've completed this task:
+  [E][X] another event (from: Sep 01 2025, to: Sep 02 2025)
+____________________________________________________________
+____________________________________________________________
+Here are your tasks:
+1. [T][ ] something
+2. [D][X] a deadline (by: Aug 30 2025 18:00)
+3. [D][ ] another deadline (by: Jan 09 2025 20:00)
+4. [D][X] last deadline (by: Dec 30 2025)
+5. [E][ ] an event (from: Aug 30 2025 18:00, to: Aug 30 2025 20:00)
+6. [E][X] another event (from: Sep 01 2025, to: Sep 02 2025)
+____________________________________________________________
+____________________________________________________________
+OK, I've marked this task as not done yet:
+  [D][ ] last deadline (by: Dec 30 2025)
+____________________________________________________________
+____________________________________________________________
+Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n> | bye
+____________________________________________________________
+____________________________________________________________
+Successfully deleted this task:
+  [E][X] another event (from: Sep 01 2025, to: Sep 02 2025)
+Now you have 5 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Successfully deleted this task:
+  [E][ ] an event (from: Aug 30 2025 18:00, to: Aug 30 2025 20:00)
+Now you have 4 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Successfully deleted this task:
+  [D][ ] last deadline (by: Dec 30 2025)
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Successfully deleted this task:
+  [D][ ] another deadline (by: Jan 09 2025 20:00)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Successfully deleted this task:
+  [D][X] a deadline (by: Aug 30 2025 18:00)
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Successfully deleted this task:
+  [T][ ] something
+Now you have 0 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are your tasks:
+
 ____________________________________________________________
 ____________________________________________________________
 ByeByeBye

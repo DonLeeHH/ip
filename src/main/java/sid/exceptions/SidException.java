@@ -1,7 +1,5 @@
 package sid.exceptions;
 
-import sid.Sid;
-
 /**
  * Application-specific checked exception for the Sid chatbot.
  *

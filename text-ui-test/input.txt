@@ -1,8 +1,21 @@
-todo borrow book
-deadline return book /by Sunday
-event project meeting /from Mon 2pm /to 4pm
-mark 1
+todo something
+deadline a deadline /by 2025-08-30 1800
+deadline another deadline /by 09/01/2025 2000
+deadline last deadline /by 30/12/2025
+event an event /from 2025-08-30 1800 /to 2025-08-30 2000
+event another event /from 2025-09-01 /to 2025-09-02
+list
 mark 2
-unmark 2
+mark 4
+mark 6
+list
+unmark 4
+notvalidinput
+delete 6
+delete 5
+delete 4
+delete 3
+delete 2
+delete 1
 list
 bye

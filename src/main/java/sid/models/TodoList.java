@@ -1,6 +1,5 @@
 package sid.models;
 
-import sid.Sid;
 import sid.exceptions.SidException;
 import sid.storage.Storage;
 
@@ -11,8 +10,7 @@ import java.util.List;
  * Holds an in-memory list of tasks and provides user-facing operations.
  *
  * <p>All mutating operations ({@code add}, {@code delete}, {@code markDone}, {@code unmarkDone})
- * automatically persist the updated list via the injected {@link Storage} and also print a
- * formatted confirmation using {@link Sid#SpecialPrint(String)}.
+ * automatically persist the updated list via the injected {@link Storage}
  *
  * <p>Unless stated otherwise, user-facing task indices are 1-based (as shown in {@link #toString()}).
  */
