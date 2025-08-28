@@ -86,7 +86,10 @@ public class Storage {
         return new TodoList(initialList, this);
     }
 
-    /** Saves the entire TodoList. Creates parent folder (e.g. ./data) when needed. */
+    /**
+     * Saves the current list into the disk
+     * @param list The current list
+     */
     public void save(TodoList list) {
         // Ensure ./data exists
         File parent = this.file.getParentFile();
@@ -105,6 +108,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Returns the serialized string representing a todo to be saved onto the disk
+     * @param t The task to be serialized into a string
+     * @return a serialized string
+     * @throws SidException If task is of unknown type
+     * @see sid.enums.TaskType
+     */
     private String serializeTodo(ToDo t) throws SidException {
         TaskType type;
         String extra = "";
