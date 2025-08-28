@@ -78,6 +78,12 @@ public class TodoList {
         storage.save(this);
     }
 
+    /**
+     * Deletes the task at the given one-based index
+     *
+     * @param id 1-based task number as displayed to the user.
+     * @throws SidException If {@code id} is out of range
+     */
     public void delete(int id) throws SidException {
         int i = id - 1;
         if (i < 0 || i >= this.getSize()) {
@@ -88,9 +94,9 @@ public class TodoList {
     }
 
     /**
-     * Returns the task at the given zero-based index.
+     * Returns the task at the given one-based index
      *
-     * @param id One-based position in the internal list.
+     * @param id 1-based task number as displayed to the user.
      * @return The task at the specified position.
      * @throws SidException If {@code id} is out of range.
      */
