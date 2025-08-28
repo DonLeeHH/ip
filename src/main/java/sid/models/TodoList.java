@@ -5,6 +5,8 @@ import sid.storage.Storage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Holds an in-memory list of tasks and provides user-facing operations.
@@ -27,6 +29,11 @@ public class TodoList {
     public TodoList(List<ToDo> initialList, Storage storage) {
         this.todoList = new ArrayList<>(initialList);
         this.storage = storage;
+    }
+
+    public TodoList(List<ToDo> initialList) {
+        this.todoList = new ArrayList<>(initialList);
+        this.storage = null;
     }
 
     /**
@@ -110,9 +117,31 @@ public class TodoList {
         }
     }
 
+    public TodoList findTodos(String keyword) {
+        List<ToDo> results = new ArrayList<>();
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new TodoList(results); // empty
+        }
+
+        String query = keyword.trim().toLowerCase();
+        for (ToDo t : this.todoList) {
+            if ((t.getDescription() != null &&
+                    t.getDescription().toLowerCase().contains(query))
+                    || (t.toString() != null &&
+                    t.toString().toLowerCase().contains(query))) {
+                results.add(t);
+            }
+        }
+        return new TodoList(results);
+    }
+
+    public boolean isEmpty() {
+        return this.todoList.isEmpty();
+    }
+
     @Override
     public String toString() {
-        StringBuilder output = new StringBuilder("Here are your tasks:\n");
+        StringBuilder output = new StringBuilder();
         for (int i = 0; i < this.todoList.size(); i++) {
             output.append((i + 1)).append(". ").append(this.todoList.get(i));
             if (i < this.todoList.size() - 1) {

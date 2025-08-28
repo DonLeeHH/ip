@@ -42,7 +42,7 @@ public class Ui {
     // ---------- High-level task messages (used by Parser) ----------
 
     public void showList(TodoList tasks) {
-        frame(tasks.toString());
+        frame("Here are your tasks:\n" + tasks.toString());
     }
 
     public void showTaskAdded(ToDo task, int total) {
@@ -61,6 +61,10 @@ public class Ui {
 
     public void showTaskUnmarked(ToDo task) {
         frame("OK, I've marked this task as not done yet:\n  " + task);
+    }
+
+    public void showFind(TodoList foundTasks) {
+        frame("Here are the tasks I found:\n" + foundTasks.toString());
     }
 
     // ---------- Input plumbing ----------

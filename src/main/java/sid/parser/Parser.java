@@ -140,6 +140,19 @@ public class Parser {
             return true;
         }
 
+        case "find": {
+            if (arg.isEmpty()) {
+                throw new SidException("Usage: find <keyword>");
+            }
+            TodoList foundTodos = tasks.findTodos(arg);
+            if (foundTodos.isEmpty()) {
+                ui.showError("No tasks found.");
+            } else {
+                ui.showFind(foundTodos);
+            }
+            return true;
+        }
+
         default:
             throw new SidException(
                     "Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n> | bye"
