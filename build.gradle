@@ -47,7 +47,7 @@ test {
 }
 
 application {
-    mainClass.set("sid.Sid")
+    mainClass.set("sid.Launcher")
 }
 
 shadowJar {
