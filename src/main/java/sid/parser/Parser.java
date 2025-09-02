@@ -1,17 +1,17 @@
 package sid.parser;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 import sid.exceptions.SidException;
 import sid.models.Deadline;
 import sid.models.Event;
 import sid.models.ToDo;
 import sid.models.TodoList;
 import sid.ui.Ui;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 /**
  * Parses user commands and executes them against the task list.
@@ -174,9 +174,9 @@ public class Parser {
     private LocalDateTime parseFlexibleDateTime(String text) throws SidException {
         // date + time
         DateTimeFormatter[] dateTimePatterns = new DateTimeFormatter[] {
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
-                DateTimeFormatter.ofPattern("d/M/yyyy HHmm"),
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME // e.g., 2019-12-02T18:00
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
+            DateTimeFormatter.ofPattern("d/M/yyyy HHmm"),
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME // e.g., 2019-12-02T18:00
         };
         for (DateTimeFormatter f : dateTimePatterns) {
             try {
@@ -197,8 +197,8 @@ public class Parser {
         }
 
         throw new SidException(
-                "Could not parse date/time: " + text +
-                        "\nTry: 2025-12-02 1800, 2025-12-02, 2/12/2025 1800, or 2/12/2025"
+                "Could not parse date/time: " + text
+                        + "\nTry: 2025-12-02 1800, 2025-12-02, 2/12/2025 1800, or 2/12/2025"
         );
     }
 }

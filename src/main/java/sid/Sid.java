@@ -27,7 +27,7 @@ public class Sid {
     public Sid(String filePath) {
         this.ui = new Ui();
         this.storage = new Storage(filePath);
-        this.todoList = storage.load();   // Storage returns a TodoList bound to itself
+        this.todoList = storage.load(); // Storage returns a TodoList bound to itself
         this.parser = new Parser();
     }
 

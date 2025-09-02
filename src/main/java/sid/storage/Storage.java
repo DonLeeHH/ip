@@ -1,12 +1,5 @@
 package sid.storage;
 
-import sid.enums.TaskType;
-import sid.exceptions.SidException;
-import sid.models.Deadline;
-import sid.models.Event;
-import sid.models.ToDo;
-import sid.models.TodoList;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -16,6 +9,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import sid.enums.TaskType;
+import sid.exceptions.SidException;
+import sid.models.Deadline;
+import sid.models.Event;
+import sid.models.ToDo;
+import sid.models.TodoList;
 
 /**
  * Persists and retrieves tasks in a pipe-separated flat file.
