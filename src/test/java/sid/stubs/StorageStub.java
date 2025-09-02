@@ -1,20 +1,23 @@
 package sid.stubs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import sid.exceptions.SidException;
 import sid.models.ToDo;
 import sid.models.TodoList;
 import sid.storage.Storage;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Test double for Storage that avoids disk I/O and records save() calls.
  */
 public class StorageStub extends Storage {
-    public int saveCalls = 0;
     public final List<String> snapshots = new ArrayList<>();
+    private int saveCalls = 0;
 
+    /**
+     * Constructs a StorageStub for testing purposes.
+     */
     public StorageStub() {
         // Path is unused; superclass requires a constructor arg.
         super("build/test-tmp/unused.txt");
@@ -24,6 +27,14 @@ public class StorageStub extends Storage {
     public TodoList load() {
         // Not needed for these tests; return an empty list bound to this stub.
         return new TodoList(new ArrayList<ToDo>(), this);
+    }
+
+    /**
+     * Returns the number of times save() has been called.
+     * @return number of save calls
+     */
+    public int getSaveCalls() {
+        return saveCalls;
     }
 
     @Override
