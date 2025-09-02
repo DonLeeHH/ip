@@ -45,11 +45,13 @@ public class Ui {
         frame("Here are your tasks:\n" + tasks.toString());
     }
 
+    /** Shows confirmation that a task has been added successfully*/
     public void showTaskAdded(ToDo task, int total) {
         frame("Got it. I've added this task:\n  " + task
                 + "\nNow you have " + total + " tasks in the list.");
     }
 
+    /** Shows confirmation that a task has been deleted successfully*/
     public void showTaskDeleted(ToDo task, int total) {
         frame("Successfully deleted this task:\n  " + task
                 + "\nNow you have " + total + " tasks in the list.");

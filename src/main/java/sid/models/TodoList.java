@@ -1,12 +1,9 @@
 package sid.models;
+import java.util.ArrayList;
+import java.util.List;
 
 import sid.exceptions.SidException;
 import sid.storage.Storage;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Holds an in-memory list of tasks and provides user-facing operations.
@@ -31,6 +28,11 @@ public class TodoList {
         this.storage = storage;
     }
 
+    /**
+     * Constructs a task list initalized with the given tasks without a bounded storage.
+     *
+     * @param initialList Initial tasks to populate the list with.
+     */
     public TodoList(List<ToDo> initialList) {
         this.todoList = new ArrayList<>(initialList);
         this.storage = null;
@@ -80,6 +82,11 @@ public class TodoList {
         return this.todoList.size();
     }
 
+    /**
+     * Adds the task to the end of the current list and saves it to the storage.
+     *
+     * @param task - the task to be added
+     */
     public void add(ToDo task) {
         todoList.add(task);
         storage.save(this);
@@ -110,13 +117,19 @@ public class TodoList {
     public ToDo getTodo(int id) throws SidException {
         // For one-based indexing
         id -= 1;
-        if  (id < 0 || id >= this.getSize()) {
+        if (id < 0 || id >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         } else {
             return this.todoList.get(id);
         }
     }
 
+    /**
+     * Returns the found tasks matching the given keyword
+     *
+     * @param keyword The keyword to search for
+     * @return A TodoList of the tasks that have matched the keyword
+     */
     public TodoList findTodos(String keyword) {
         List<ToDo> results = new ArrayList<>();
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -125,9 +138,11 @@ public class TodoList {
 
         String query = keyword.trim().toLowerCase();
         for (ToDo t : this.todoList) {
-            if ((t.getDescription() != null &&
+            if ((t.getDescription() != null
+                        &&
                     t.getDescription().toLowerCase().contains(query))
-                    || (t.toString() != null &&
+                    || (t.toString() != null
+                        &&
                     t.toString().toLowerCase().contains(query))) {
                 results.add(t);
             }

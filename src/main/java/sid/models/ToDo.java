@@ -10,14 +10,14 @@ import sid.enums.TaskType;
  * {@code [T][ ] read book} or {@code [T][X] read book}.
  */
 public class ToDo {
+    /** Categorical task type; defaults to {@link TaskType#TODO}. */
+    protected TaskType type = TaskType.TODO;
+
     /** Human-readable description of the task. */
     private String description;
 
     /** Whether the task has been completed. */
     private boolean isDone;
-
-    /** Categorical task type; defaults to {@link TaskType#TODO}. */
-    protected TaskType type = TaskType.TODO;
 
     /**
      * Constructs a to-do task with the given description and completion flag.
@@ -47,7 +47,7 @@ public class ToDo {
     public boolean isDone() {
         return this.isDone;
     }
-    
+
     public String getDescription() {
         return this.description;
     }
