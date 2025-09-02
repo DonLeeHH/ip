@@ -16,7 +16,7 @@ import sid.ui.Ui;
 /**
  * Parses user commands and executes them against the task list.
  *
- * <p>Level 8: Dates/times are parsed into {@link LocalDateTime}. Accepted input
+ * <p>Level 8: Dates/times are parsed into {@link LocalDateTime}. Accepted inpu
  * formats include {@code yyyy-MM-dd[ HHmm]} and {@code d/M/yyyy[ HHmm]}; ISO
  * {@code yyyy-MM-dd'T'HH:mm} is also supported. Date-only inputs default to
  * {@code 00:00}.
@@ -160,6 +160,133 @@ public class Parser {
         }
     }
 
+
+    /**
+     * Parses and executes the command input from JavaFX GUI.
+     *
+     * <p>Returns response string
+     *
+     * @param input Raw user input.
+     * @param tasks Task list to operate on.
+     */
+    public String parseAndExecute(String input, TodoList tasks) {
+        String line = input.trim();
+        if (line.isEmpty()) {
+            return "Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n>";
+        }
+
+        String[] parts = line.split("\\s+", 2);
+        String cmd = parts[0].toLowerCase();
+        String arg = (parts.length > 1) ? parts[1].trim() : "";
+
+        try {
+            switch (cmd) {
+            case "list":
+                if (tasks.isEmpty()) {
+                    return "You currently have no tasks!";
+                }
+                return "Here are your tasks:\n" + tasks.toString();
+
+            case "todo": {
+                if (arg.isEmpty()) {
+                    return "Usage: todo <description>";
+                }
+                ToDo todo = new ToDo(arg, false);
+                tasks.add(todo);
+                return "Successfully added\nTodo: " + todo.toString();
+            }
+
+            case "deadline": {
+                if (arg.isEmpty()) {
+                    return "Usage: deadline <description> /by <yyyy-MM-dd HHmm>";
+                }
+                String[] seg = arg.split("\\s*/by\\s+", 2);
+                if (seg.length < 2 || seg[0].isBlank() || seg[1].isBlank()) {
+                    return "Usage: deadline <description> /by <yyyy-MM-dd HHmm>";
+                }
+                String desc = seg[0].trim();
+                LocalDateTime when = parseFlexibleDateTime(seg[1].trim());
+                Deadline d = new Deadline(desc, when, false);
+                tasks.add(d);
+                return "Successfully added\nDeadline: " + d.toString();
+            }
+
+            case "event": {
+                if (arg.isEmpty()) {
+                    return "Usage: event <description> /from <yyyy-MM-dd[ HHmm]> /to <yyyy-MM-dd HHmm>";
+                }
+                String[] a = arg.split("(?i)\\s*/from\\s+", 2);
+                if (a.length < 2 || a[0].isBlank()) {
+                    return "Usage: event <description> /from <yyyy-MM-dd[ HHmm]> /to <yyyy-MM-dd HHmm>";
+                }
+                String desc = a[0].trim();
+                String[] b = a[1].split("(?i)\\s*/to\\s+", 2);
+                if (b.length < 2 || b[0].isBlank() || b[1].isBlank()) {
+                    return "Usage: event <description> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>";
+                }
+                LocalDateTime start = parseFlexibleDateTime(b[0].trim());
+                LocalDateTime end = parseFlexibleDateTime(b[1].trim());
+                if (end.isBefore(start)) {
+                    return "Event end must be on/after start.";
+                }
+                Event e = new Event(desc, start, end, false);
+                tasks.add(e);
+                return "Successfully added\n Event: " + e.toString();
+            }
+
+            case "mark": {
+                if (arg.isEmpty()) {
+                    return "Usage: mark <task-number>";
+                }
+                int id = parseIndex(arg, "Please provide a valid number after 'mark'.");
+                ToDo updated = tasks.markDone(id);
+                return "Successfully marked task number " + id;
+            }
+
+            case "unmark": {
+                if (arg.isEmpty()) {
+                    return "Usage: unmark <task-number>";
+                }
+                int id = parseIndex(arg, "Please provide a valid number after 'unmark'.");
+                ToDo updated = tasks.unmarkDone(id);
+                return "Successfully unmarked task number " + id;
+            }
+
+            case "delete": {
+                if (arg.isEmpty()) {
+                    return "Usage: delete <task-number>";
+                }
+                int id = parseIndex(arg, "Please provide a valid number after 'delete'.");
+                // capture the item first so we can show it after deletion
+                ToDo toRemove = tasks.getTodo(id);
+                tasks.delete(id);
+                return "Successfully deleted task:\n" + toRemove.toString();
+            }
+
+            case "find": {
+                if (arg.isEmpty()) {
+                    return "Usage: find <keyword>";
+                }
+                TodoList foundTodos = tasks.findTodos(arg);
+                if (foundTodos.isEmpty()) {
+                    return "No tasks found";
+                } else {
+                    return "Here are the tasks I found:\n" + foundTodos.toString();
+                }
+            }
+
+            case "bye": {
+                return "Goodbye!";
+            }
+
+            default:
+                return "Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n>";
+            }
+        } catch (SidException error) {
+            return error.getMessage();
+        }
+    }
+
     // ---- helpers ------------------------------------------------------------
 
     private int parseIndex(String s, String errorMsg) throws SidException {
@@ -184,7 +311,7 @@ public class Parser {
             } catch (DateTimeParseException ignore) { /* try next */ }
         }
 
-        // date only -> midnight
+        // date only -> midnigh
         DateTimeFormatter[] dateOnlyPatterns = new DateTimeFormatter[] {
                 DateTimeFormatter.ofPattern("yyyy-MM-dd"),
                 DateTimeFormatter.ofPattern("d/M/yyyy")

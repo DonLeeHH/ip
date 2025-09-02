@@ -1,10 +1,12 @@
 package sid.models;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the Event task model (Level 8 date/time formatting).
@@ -14,7 +16,7 @@ class EventTest {
     @Test
     void constructor_withDateTimes_rendersWithTimes() {
         LocalDateTime start = LocalDateTime.of(2025, 8, 30, 18, 0);
-        LocalDateTime end   = LocalDateTime.of(2025, 8, 30, 20, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 8, 30, 20, 0);
 
         Event e = new Event("an event", start, end, false);
 
@@ -27,7 +29,7 @@ class EventTest {
     @Test
     void constructor_midnightDates_rendersDateOnlyOnBothSides() {
         LocalDateTime start = LocalDateTime.of(2025, 9, 1, 0, 0);
-        LocalDateTime end   = LocalDateTime.of(2025, 9, 2, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 9, 2, 0, 0);
 
         Event e = new Event("another event", start, end, false);
 
@@ -36,8 +38,8 @@ class EventTest {
 
     @Test
     void constructor_mixedDateAndDateTime_formatsEachSideIndependently() {
-        LocalDateTime start = LocalDateTime.of(2025, 12, 30, 0, 0);   // date only
-        LocalDateTime end   = LocalDateTime.of(2025, 12, 30, 15, 45); // with time
+        LocalDateTime start = LocalDateTime.of(2025, 12, 30, 0, 0); // date only
+        LocalDateTime end = LocalDateTime.of(2025, 12, 30, 15, 45); // with time
 
         Event e = new Event("mixed event", start, end, false);
 
@@ -47,7 +49,7 @@ class EventTest {
     @Test
     void markAndUnmark_toggleDoneStateInOutput() {
         LocalDateTime start = LocalDateTime.of(2025, 9, 1, 0, 0);
-        LocalDateTime end   = LocalDateTime.of(2025, 9, 2, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 9, 2, 0, 0);
 
         Event e = new Event("trip", start, end, false);
 

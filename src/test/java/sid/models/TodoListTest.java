@@ -1,14 +1,19 @@
 package sid.models;
 
-import org.junit.jupiter.api.Test;
-import sid.exceptions.SidException;
-import sid.stubs.StorageStub;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import sid.exceptions.SidException;
+import sid.stubs.StorageStub;
 
 /**
  * Tests for TodoList behavior (mutations, indexing, and findTodos).
@@ -16,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TodoListTest {
 
     @Test
-    void add_marksAndUnmarksAndDelete_triggerSaves_andUpdateState() throws SidException {
+    void add_marksAndUnmarks_triggerSaves() throws SidException {
         StorageStub storage = new StorageStub();
         List<ToDo> seed = new ArrayList<>();
         TodoList list = new TodoList(seed, storage);
@@ -24,29 +29,29 @@ class TodoListTest {
         // add
         list.add(new ToDo("alpha", false));
         assertEquals(1, list.getSize());
-        assertEquals(1, storage.saveCalls);
+        assertEquals(1, storage.getSaveCalls());
         assertTrue(storage.snapshots.get(0).contains("[T][ ] alpha"));
 
         // add second, then mark #2
         list.add(new ToDo("beta", false));
         assertEquals(2, list.getSize());
-        assertEquals(2, storage.saveCalls);
+        assertEquals(2, storage.getSaveCalls());
 
         ToDo marked = list.markDone(2); // 1-based index
         assertTrue(marked.isDone());
-        assertEquals(3, storage.saveCalls);
+        assertEquals(3, storage.getSaveCalls());
         assertTrue(storage.snapshots.get(2).contains("[T][X] beta"));
 
         // unmark #2
         ToDo unmarked = list.unmarkDone(2);
         assertFalse(unmarked.isDone());
-        assertEquals(4, storage.saveCalls);
+        assertEquals(4, storage.getSaveCalls());
         assertTrue(storage.snapshots.get(3).contains("[T][ ] beta"));
 
         // delete #1
         list.delete(1);
         assertEquals(1, list.getSize());
-        assertEquals(5, storage.saveCalls);
+        assertEquals(5, storage.getSaveCalls());
         assertTrue(storage.snapshots.get(4).contains("[T][ ] beta"));
     }
 
@@ -104,7 +109,7 @@ class TodoListTest {
     }
 
     @Test
-    void findTodos_returnsEmptyList_onNullOrEmptyKeyword_orNoMatches() {
+    void findTodos_returnsEmptyList_onNullOrEmpty() {
         TodoList list = new TodoList(List.of(
                 new ToDo("alpha", false),
                 new ToDo("beta", false)
