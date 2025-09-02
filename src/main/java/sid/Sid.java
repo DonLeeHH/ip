@@ -60,4 +60,12 @@ public class Sid {
     public static void main(String[] args) {
         new Sid("data/sid.txt").run();
     }
+
+    /**
+     * Generates a response for the user's chat message.
+     */
+    public String getResponse(String input) {
+        String response = parser.parseAndExecute(input, todoList);
+        return response;
+    }
 }
