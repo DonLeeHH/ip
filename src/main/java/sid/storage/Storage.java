@@ -184,6 +184,7 @@ public class Storage {
             break;
 
         case DEADLINE:
+            // Guard clause for validation
             if (parts.length < DEADLINE_FIELDS) {
                 throw new SidException("Deadline missing 'by' field");
             }
@@ -192,6 +193,7 @@ public class Storage {
             break;
 
         case EVENT:
+            // Guard clause for validation
             if (parts.length < EVENT_FIELDS) {
                 throw new SidException("Event missing start/end fields");
             }

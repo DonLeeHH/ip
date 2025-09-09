@@ -170,11 +170,12 @@ public class Parser {
             break;
 
         case "find":
+            // Guard clause: handle empty results early
             if (result.getFoundTasks().isEmpty()) {
                 ui.showError("No tasks found.");
-            } else {
-                ui.showFind(result.getFoundTasks());
+                break;
             }
+            ui.showFind(result.getFoundTasks());
             break;
 
         default:
