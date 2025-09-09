@@ -10,6 +10,10 @@ import sid.enums.TaskType;
  * {@code [T][ ] read book} or {@code [T][X] read book}.
  */
 public class ToDo {
+
+    private static final String DONE_FLAG = "X";
+    private static final String NOT_DONE_FLAG = " ";
+
     /** Categorical task type; defaults to {@link TaskType#TODO}. */
     protected TaskType type = TaskType.TODO;
 
@@ -54,6 +58,6 @@ public class ToDo {
 
     @Override
     public String toString() {
-        return "[" + this.type + "][" + (this.isDone ? "X" : " ") + "] " + this.description;
+        return "[" + this.type + "][" + (this.isDone ? DONE_FLAG : NOT_DONE_FLAG) + "] " + this.description;
     }
 }
