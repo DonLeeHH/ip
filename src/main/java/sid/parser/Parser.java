@@ -1,15 +1,19 @@
 package sid.parser;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.util.Map;
 
+import sid.commands.ByeCommand;
+import sid.commands.Command;
+import sid.commands.CommandResult;
+import sid.commands.DeadlineCommand;
+import sid.commands.DeleteCommand;
+import sid.commands.EventCommand;
+import sid.commands.FindCommand;
+import sid.commands.ListCommand;
+import sid.commands.MarkCommand;
+import sid.commands.TodoCommand;
+import sid.commands.UnmarkCommand;
 import sid.exceptions.SidException;
-import sid.models.Deadline;
-import sid.models.Event;
-import sid.models.ToDo;
 import sid.models.TodoList;
 import sid.ui.Ui;
 
@@ -22,6 +26,19 @@ import sid.ui.Ui;
  * {@code 00:00}.
  */
 public class Parser {
+    /** Split limit for command parsing: command + arguments. */
+    private static final int COMMAND_SPLIT_LIMIT = 2;
+    private final Map<String, Command> commands = Map.of(
+        "list", new ListCommand(),
+        "todo", new TodoCommand(),
+        "deadline", new DeadlineCommand(),
+        "event", new EventCommand(),
+        "mark", new MarkCommand(),
+        "unmark", new UnmarkCommand(),
+        "delete", new DeleteCommand(),
+        "find", new FindCommand(),
+        "bye", new ByeCommand()
+    );
 
     /**
      * Parses and executes a single command line.
@@ -47,120 +64,21 @@ public class Parser {
             return true; // ignore empty lines
         }
 
-        String[] parts = line.split("\\s+", 2);
+        String[] parts = line.split("\\s+", COMMAND_SPLIT_LIMIT);
         String cmd = parts[0].toLowerCase();
         String arg = (parts.length > 1) ? parts[1].trim() : "";
 
-        switch (cmd) {
-        case "bye":
+        // Handle special case for bye command that needs UI interaction
+        if (cmd.equals("bye")) {
             ui.showGoodbye();
             return false;
-
-        case "list":
-            ui.showList(tasks);
-            return true;
-
-        case "todo": {
-            if (arg.isEmpty()) {
-                throw new SidException("Usage: todo <description>");
-            }
-            ToDo todo = new ToDo(arg, false);
-            tasks.add(todo);
-            ui.showTaskAdded(todo, tasks.getSize());
-            return true;
         }
 
-        case "deadline": {
-            if (arg.isEmpty()) {
-                throw new SidException("Usage: deadline <description> /by <yyyy-MM-dd HHmm>");
-            }
-            String[] seg = arg.split("\\s*/by\\s+", 2);
-            if (seg.length < 2 || seg[0].isBlank() || seg[1].isBlank()) {
-                throw new SidException("Usage: deadline <description> /by <yyyy-MM-dd HHmm>");
-            }
-            String desc = seg[0].trim();
-            LocalDateTime when = parseFlexibleDateTime(seg[1].trim());
-            Deadline d = new Deadline(desc, when, false);
-            tasks.add(d);
-            ui.showTaskAdded(d, tasks.getSize());
-            return true;
-        }
+        // Execute the command and display results
+        CommandResult result = executeCommand(cmd, arg, tasks);
+        displayCommandResult(cmd, result, tasks, ui);
 
-        case "event": {
-            if (arg.isEmpty()) {
-                throw new SidException("Usage: event <description> /from <yyyy-MM-dd[ HHmm]> /to <yyyy-MM-dd HHmm>");
-            }
-            String[] a = arg.split("(?i)\\s*/from\\s+", 2);
-            if (a.length < 2 || a[0].isBlank()) {
-                throw new SidException("Usage: event <description> /from <yyyy-MM-dd[ HHmm]> /to <yyyy-MM-dd HHmm>");
-            }
-            String desc = a[0].trim();
-            String[] b = a[1].split("(?i)\\s*/to\\s+", 2);
-            if (b.length < 2 || b[0].isBlank() || b[1].isBlank()) {
-                throw new SidException("Usage: event <description> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>");
-            }
-            LocalDateTime start = parseFlexibleDateTime(b[0].trim());
-            LocalDateTime end = parseFlexibleDateTime(b[1].trim());
-            if (end.isBefore(start)) {
-                throw new SidException("Event end must be on/after start.");
-            }
-            assert !end.isBefore(start) : "Event end date constraint validated";
-            Event e = new Event(desc, start, end, false);
-            tasks.add(e);
-            ui.showTaskAdded(e, tasks.getSize());
-            return true;
-        }
-
-        case "mark": {
-            if (arg.isEmpty()) {
-                throw new SidException("Usage: mark <task-number>");
-            }
-            int id = parseIndex(arg, "Please provide a valid number after 'mark'.");
-            ToDo updated = tasks.markDone(id);
-            ui.showTaskMarked(updated);
-            return true;
-        }
-
-        case "unmark": {
-            if (arg.isEmpty()) {
-                throw new SidException("Usage: unmark <task-number>");
-            }
-            int id = parseIndex(arg, "Please provide a valid number after 'unmark'.");
-            ToDo updated = tasks.unmarkDone(id);
-            ui.showTaskUnmarked(updated);
-            return true;
-        }
-
-        case "delete": {
-            if (arg.isEmpty()) {
-                throw new SidException("Usage: delete <task-number>");
-            }
-            int id = parseIndex(arg, "Please provide a valid number after 'delete'.");
-            // capture the item first so we can show it after deletion
-            ToDo toRemove = tasks.getTodo(id);
-            tasks.delete(id);
-            ui.showTaskDeleted(toRemove, tasks.getSize());
-            return true;
-        }
-
-        case "find": {
-            if (arg.isEmpty()) {
-                throw new SidException("Usage: find <keyword>");
-            }
-            TodoList foundTodos = tasks.findTodos(arg);
-            if (foundTodos.isEmpty()) {
-                ui.showError("No tasks found.");
-            } else {
-                ui.showFind(foundTodos);
-            }
-            return true;
-        }
-
-        default:
-            throw new SidException(
-                    "Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n> | bye"
-            );
-        }
+        return result.shouldContinue();
     }
 
 
@@ -180,187 +98,93 @@ public class Parser {
             return "Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n>";
         }
 
-        String[] parts = line.split("\\s+", 2);
+        String[] parts = line.split("\\s+", COMMAND_SPLIT_LIMIT);
         String cmd = parts[0].toLowerCase();
         String arg = (parts.length > 1) ? parts[1].trim() : "";
 
         try {
-            switch (cmd) {
-            case "list":
-                if (tasks.isEmpty()) {
-                    return "You currently have no tasks!";
-                }
-                return "Here are your tasks:\n" + tasks.toString();
-
-            case "todo": {
-                if (arg.isEmpty()) {
-                    return "Usage: todo <description>";
-                }
-                ToDo todo = new ToDo(arg, false);
-                tasks.add(todo);
-                return "Successfully added\nTodo: " + todo.toString();
-            }
-
-            case "deadline": {
-                if (arg.isEmpty()) {
-                    return "Usage: deadline <description> /by <yyyy-MM-dd HHmm>";
-                }
-                String[] seg = arg.split("\\s*/by\\s+", 2);
-                if (seg.length < 2 || seg[0].isBlank() || seg[1].isBlank()) {
-                    return "Usage: deadline <description> /by <yyyy-MM-dd HHmm>";
-                }
-                String desc = seg[0].trim();
-                LocalDateTime when = parseFlexibleDateTime(seg[1].trim());
-                Deadline d = new Deadline(desc, when, false);
-                tasks.add(d);
-                return "Successfully added\nDeadline: " + d.toString();
-            }
-
-            case "event": {
-                if (arg.isEmpty()) {
-                    return "Usage: event <description> /from <yyyy-MM-dd[ HHmm]> /to <yyyy-MM-dd HHmm>";
-                }
-                String[] a = arg.split("(?i)\\s*/from\\s+", 2);
-                if (a.length < 2 || a[0].isBlank()) {
-                    return "Usage: event <description> /from <yyyy-MM-dd[ HHmm]> /to <yyyy-MM-dd HHmm>";
-                }
-                String desc = a[0].trim();
-                String[] b = a[1].split("(?i)\\s*/to\\s+", 2);
-                if (b.length < 2 || b[0].isBlank() || b[1].isBlank()) {
-                    return "Usage: event <description> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>";
-                }
-                LocalDateTime start = parseFlexibleDateTime(b[0].trim());
-                LocalDateTime end = parseFlexibleDateTime(b[1].trim());
-                if (end.isBefore(start)) {
-                    return "Event end must be on/after start.";
-                }
-                Event e = new Event(desc, start, end, false);
-                tasks.add(e);
-                return "Successfully added\n Event: " + e.toString();
-            }
-
-            case "mark": {
-                if (arg.isEmpty()) {
-                    return "Usage: mark <task-number>";
-                }
-                int id = parseIndex(arg, "Please provide a valid number after 'mark'.");
-                ToDo updated = tasks.markDone(id);
-                return "Successfully marked task number " + id;
-            }
-
-            case "unmark": {
-                if (arg.isEmpty()) {
-                    return "Usage: unmark <task-number>";
-                }
-                int id = parseIndex(arg, "Please provide a valid number after 'unmark'.");
-                ToDo updated = tasks.unmarkDone(id);
-                return "Successfully unmarked task number " + id;
-            }
-
-            case "delete": {
-                if (arg.isEmpty()) {
-                    return "Usage: delete <task-number>";
-                }
-                int id = parseIndex(arg, "Please provide a valid number after 'delete'.");
-                // capture the item first so we can show it after deletion
-                ToDo toRemove = tasks.getTodo(id);
-                tasks.delete(id);
-                return "Successfully deleted task:\n" + toRemove.toString();
-            }
-
-            case "find": {
-                if (arg.isEmpty()) {
-                    return "Usage: find <keyword>";
-                }
-                TodoList foundTodos = tasks.findTodos(arg);
-                if (foundTodos.isEmpty()) {
-                    return "No tasks found";
-                } else {
-                    return "Here are the tasks I found:\n" + foundTodos.toString();
-                }
-            }
-
-            case "bye": {
-                return "Goodbye!";
-            }
-
-            default:
-                return "Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n>";
-            }
+            CommandResult result = executeCommand(cmd, arg, tasks);
+            return result.getMessage();
         } catch (SidException error) {
             return error.getMessage();
         }
     }
 
-    // ---- helpers ------------------------------------------------------------
+    // ---- Command execution methods ----
 
-    private int parseIndex(String s, String errorMsg) throws SidException {
-        assert s != null : "String to parse cannot be null";
-        assert errorMsg != null : "Error message cannot be null";
-        try {
-            int result = Integer.parseInt(s.trim());
-            assert result > 0 : "Parsed task ID must be positive (1-based indexing)";
-            return result;
-        } catch (NumberFormatException e) {
-            throw new SidException(errorMsg);
-        }
-    }
+    /**
+     * Executes a command and returns the result.
+     *
+     * @param cmd The command to execute.
+     * @param arg The argument for the command.
+     * @param tasks The task list to operate on.
+     * @return The result of command execution.
+     * @throws SidException If the command is invalid or execution fails.
+     */
+    private CommandResult executeCommand(String cmd, String arg, TodoList tasks) throws SidException {
+        assert cmd != null : "Command cannot be null";
+        assert arg != null : "Argument cannot be null";
+        assert tasks != null : "TodoList cannot be null";
 
-    /** Tries several patterns; if only a date is present, time defaults to 00:00. */
-    private LocalDateTime parseFlexibleDateTime(String text) throws SidException {
-        // Try date + time patterns first
-        LocalDateTime dateTime = tryParseDateTime(text,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
-                DateTimeFormatter.ofPattern("d/M/yyyy HHmm"),
-                DateTimeFormatter.ISO_LOCAL_DATE_TIME // e.g., 2019-12-02T18:00
-        );
-        if (dateTime != null) {
-            return dateTime;
+        Command command = commands.get(cmd);
+        if (command == null) {
+            throw new SidException(
+                    "Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n> | bye"
+            );
         }
 
-        // Try date only patterns -> midnight
-        LocalDateTime dateOnly = tryParseDateOnly(text,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-                DateTimeFormatter.ofPattern("d/M/yyyy")
-        );
-        if (dateOnly != null) {
-            return dateOnly;
-        }
-
-        throw new SidException(
-                "Could not parse date/time: " + text
-                        + "\nTry: 2025-12-02 1800, 2025-12-02, 2/12/2025 1800, or 2/12/2025"
-        );
+        return command.execute(arg, tasks);
     }
 
     /**
-     * Tries to parse text as LocalDateTime using the given formatters.
-     * @param text the text to parse
-     * @param formatters formatters to try in order
-     * @return parsed LocalDateTime or null if none work
+     * Displays the command result through the UI based on command type.
+     *
+     * @param cmd The command that was executed.
+     * @param result The result of command execution.
+     * @param tasks The task list (needed for displaying list).
+     * @param ui The UI for output.
      */
-    private LocalDateTime tryParseDateTime(String text, DateTimeFormatter... formatters) {
-        for (DateTimeFormatter formatter : formatters) {
-            try {
-                return LocalDateTime.parse(text, formatter);
-            } catch (DateTimeParseException ignore) { /* try next */ }
-        }
-        return null;
-    }
+    private void displayCommandResult(String cmd, CommandResult result, TodoList tasks, Ui ui) {
+        assert cmd != null : "Command cannot be null";
+        assert result != null : "CommandResult cannot be null";
+        assert tasks != null : "TodoList cannot be null";
+        assert ui != null : "UI cannot be null";
 
-    /**
-     * Tries to parse text as LocalDate and converts to midnight LocalDateTime.
-     * @param text the text to parse
-     * @param formatters formatters to try in order
-     * @return parsed LocalDateTime at midnight or null if none work
-     */
-    private LocalDateTime tryParseDateOnly(String text, DateTimeFormatter... formatters) {
-        for (DateTimeFormatter formatter : formatters) {
-            try {
-                LocalDate date = LocalDate.parse(text, formatter);
-                return LocalDateTime.of(date, LocalTime.MIDNIGHT);
-            } catch (DateTimeParseException ignore) { /* try next */ }
+        switch (cmd) {
+        case "list":
+            ui.showList(tasks);
+            break;
+
+        case "todo":
+        case "deadline":
+        case "event":
+            ui.showTaskAdded(result.getTask(), result.getTotalTasks());
+            break;
+
+        case "mark":
+            ui.showTaskMarked(result.getTask());
+            break;
+
+        case "unmark":
+            ui.showTaskUnmarked(result.getTask());
+            break;
+
+        case "delete":
+            ui.showTaskDeleted(result.getTask(), result.getTotalTasks());
+            break;
+
+        case "find":
+            // Guard clause: handle empty results early
+            if (result.getFoundTasks().isEmpty()) {
+                ui.showError("No tasks found.");
+                break;
+            }
+            ui.showFind(result.getFoundTasks());
+            break;
+
+        default:
+            // Should never reach here as executeCommand handles unknown commands
+            break;
         }
-        return null;
     }
 }

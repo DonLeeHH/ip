@@ -40,6 +40,19 @@ import sid.models.TodoList;
 public class Storage {
     private static final DateTimeFormatter ISO_DT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
+    /** Minimum fields required in storage format: type, done flag, description. */
+    private static final int MIN_STORAGE_FIELDS = 3;
+
+    /** Fields required for deadline tasks: type, done flag, description, due date. */
+    private static final int DEADLINE_FIELDS = 4;
+
+    /** Fields required for event tasks: type, done flag, description, start date, end date. */
+    private static final int EVENT_FIELDS = 5;
+
+    private static final String DONE_FLAG = "1";
+
+    private static final String NOT_DONE_FLAG = "0";
+
     private final File file;
 
     /**
@@ -139,7 +152,7 @@ public class Storage {
             throw new SidException("Unknown task type: " + t.getClass().getName());
         }
 
-        int done = t.isDone() ? 1 : 0;
+        String done = t.isDone() ? DONE_FLAG : NOT_DONE_FLAG;
         String base = type.toString() + " | " + done + " | " + t.getDescription();
         return extra.isEmpty() ? base : base + " | " + extra;
     }
@@ -157,15 +170,15 @@ public class Storage {
     private ToDo deserializeToDo(String line) throws SidException {
         assert line != null : "Line to deserialize cannot be null";
         String[] parts = line.split("\\s*\\|\\s*");
-        if (parts.length < 3) {
+        if (parts.length < MIN_STORAGE_FIELDS) {
             throw new IllegalArgumentException("Too few fields");
         }
         String type = parts[0].trim();
         String doneFlag = parts[1].trim();
-        if (!doneFlag.equals("1") && !doneFlag.equals("0")) {
+        if (!doneFlag.equals(DONE_FLAG) && !doneFlag.equals(NOT_DONE_FLAG)) {
             throw new SidException("Invalid done flag");
         }
-        boolean isDone = doneFlag.equals("1");
+        boolean isDone = doneFlag.equals(DONE_FLAG);
         String description = parts[2].trim();
         ToDo task;
 
@@ -175,7 +188,8 @@ public class Storage {
             break;
 
         case DEADLINE:
-            if (parts.length < 4) {
+            // Guard clause for validation
+            if (parts.length < DEADLINE_FIELDS) {
                 throw new SidException("Deadline missing 'by' field");
             }
             LocalDateTime by = LocalDateTime.parse(parts[3].trim(), ISO_DT);
@@ -183,7 +197,8 @@ public class Storage {
             break;
 
         case EVENT:
-            if (parts.length < 5) {
+            // Guard clause for validation
+            if (parts.length < EVENT_FIELDS) {
                 throw new SidException("Event missing start/end fields");
             }
             LocalDateTime start = LocalDateTime.parse(parts[3].trim(), ISO_DT);

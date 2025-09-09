@@ -145,12 +145,16 @@ public class TodoList {
         String query = keyword.trim().toLowerCase();
         assert !query.isEmpty() : "Query should not be empty after trimming non-empty keyword";
         for (ToDo t : this.todoList) {
-            if ((t.getDescription() != null
-                        &&
-                    t.getDescription().toLowerCase().contains(query))
-                    || (t.toString() != null
-                        &&
-                    t.toString().toLowerCase().contains(query))) {
+            // Guard clause: skip if neither description nor toString contains query
+            if (t.getDescription() == null && t.toString() == null) {
+                continue;
+            }
+
+            boolean descriptionMatches = t.getDescription() != null
+                && t.getDescription().toLowerCase().contains(query);
+            boolean toStringMatches = t.toString() != null
+                && t.toString().toLowerCase().contains(query);
+            if (descriptionMatches || toStringMatches) {
                 results.add(t);
             }
         }
