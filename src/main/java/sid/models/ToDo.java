@@ -30,6 +30,8 @@ public class ToDo {
      * @param isDone      Whether the task is initially marked as completed.
      */
     public ToDo(String description, boolean isDone) {
+        assert description != null : "Task description cannot be null";
+        assert !description.trim().isEmpty() : "Task description cannot be empty";
         this.description = description;
         this.isDone = isDone;
     }

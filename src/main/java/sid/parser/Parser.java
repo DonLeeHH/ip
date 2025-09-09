@@ -53,6 +53,8 @@ public class Parser {
      * @throws SidException If the command/arguments are invalid.
      */
     public boolean parseAndExecute(String input, TodoList tasks, Ui ui) throws SidException {
+        assert tasks != null : "TodoList cannot be null";
+        assert ui != null : "UI cannot be null";
         if (input == null) {
             throw new SidException("No input provided.");
         }
@@ -89,6 +91,8 @@ public class Parser {
      * @param tasks Task list to operate on.
      */
     public String parseAndExecute(String input, TodoList tasks) {
+        assert input != null : "Input cannot be null";
+        assert tasks != null : "TodoList cannot be null";
         String line = input.trim();
         if (line.isEmpty()) {
             return "Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n>";

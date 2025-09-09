@@ -26,6 +26,7 @@ public class Deadline extends ToDo {
      */
     public Deadline(String description, LocalDateTime dueDate, boolean isDone) {
         super(description, isDone);
+        assert dueDate != null : "Due date cannot be null";
         this.dueDate = dueDate;
         this.type = TaskType.DEADLINE;
     }
@@ -40,6 +41,7 @@ public class Deadline extends ToDo {
     }
 
     private static String format(LocalDateTime dt) {
+        assert dt != null : "DateTime to format cannot be null";
         return (dt.getHour() == 0 && dt.getMinute() == 0)
                 ? dt.toLocalDate().format(DATE_FMT)
                 : dt.format(DATE_TIME_FMT);

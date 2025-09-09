@@ -25,9 +25,11 @@ public class Sid {
      * @param filePath Relative path (e.g., {@code data/sid.txt}).
      */
     public Sid(String filePath) {
+        assert filePath != null : "File path cannot be null";
         this.ui = new Ui();
         this.storage = new Storage(filePath);
         this.todoList = storage.load(); // Storage returns a TodoList bound to itself
+        assert this.todoList != null : "Loaded TodoList cannot be null";
         this.parser = new Parser();
     }
 
@@ -65,7 +67,9 @@ public class Sid {
      * Generates a response for the user's chat message.
      */
     public String getResponse(String input) {
+        assert input != null : "Input cannot be null";
         String response = parser.parseAndExecute(input, todoList);
+        assert response != null : "Parser response cannot be null";
         return response;
     }
 }

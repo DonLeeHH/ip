@@ -32,6 +32,7 @@ public class MainWindow extends AnchorPane {
 
     /** Injects the Duke instance */
     public void setSid(Sid s) {
+        assert s != null : "Sid instance cannot be null";
         sid = s;
         showWelcomeMessage();
     }
@@ -51,7 +52,9 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
+        assert input != null : "User input text cannot be null";
         String response = sid.getResponse(input);
+        assert response != null : "Sid response cannot be null";
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getSidDialog(response, sidImage)

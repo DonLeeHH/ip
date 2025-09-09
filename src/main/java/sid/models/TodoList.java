@@ -29,7 +29,7 @@ public class TodoList {
     }
 
     /**
-     * Constructs a task list initalized with the given tasks without a bounded storage.
+     * Constructs a task list initalized with the given tasks without a bounded storage, for read-only purposes.
      *
      * @param initialList Initial tasks to populate the list with.
      */
@@ -52,6 +52,7 @@ public class TodoList {
         if (i < 0 || i >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         }
+        assert i >= 0 && i < this.getSize() : "Index must be within valid range after validation";
         ToDo t = todoList.get(i);
         t.markTask();
         storage.save(this);
@@ -72,6 +73,7 @@ public class TodoList {
         if (i < 0 || i >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         }
+        assert i >= 0 && i < this.getSize() : "Index must be within valid range after validation";
         ToDo t = this.todoList.get(i);
         t.unmarkTask();
         storage.save(this);
@@ -88,7 +90,9 @@ public class TodoList {
      * @param task - the task to be added
      */
     public void add(ToDo task) {
+        assert task != null : "Cannot add null task to list";
         todoList.add(task);
+        assert storage != null : "Storage must be available for persistent operations";
         storage.save(this);
     }
 
@@ -103,7 +107,9 @@ public class TodoList {
         if (i < 0 || i >= this.getSize()) {
             throw new SidException("Not a valid task number!");
         }
+        assert i >= 0 && i < this.getSize() : "Index must be within valid range after validation";
         ToDo deletedTask = this.todoList.remove(i);
+        assert storage != null : "Storage must be available for persistent operations";
         storage.save(this);
     }
 
@@ -119,9 +125,9 @@ public class TodoList {
         id -= 1;
         if (id < 0 || id >= this.getSize()) {
             throw new SidException("Not a valid task number!");
-        } else {
-            return this.todoList.get(id);
         }
+        assert id >= 0 && id < this.getSize() : "Index must be within valid range after validation";
+        return this.todoList.get(id);
     }
 
     /**
@@ -137,6 +143,7 @@ public class TodoList {
         }
 
         String query = keyword.trim().toLowerCase();
+        assert !query.isEmpty() : "Query should not be empty after trimming non-empty keyword";
         for (ToDo t : this.todoList) {
             // Guard clause: skip if neither description nor toString contains query
             if (t.getDescription() == null && t.toString() == null) {
