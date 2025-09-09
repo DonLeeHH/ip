@@ -36,6 +36,8 @@ public class Parser {
      * @throws SidException If the command/arguments are invalid.
      */
     public boolean parseAndExecute(String input, TodoList tasks, Ui ui) throws SidException {
+        assert tasks != null : "TodoList cannot be null";
+        assert ui != null : "UI cannot be null";
         if (input == null) {
             throw new SidException("No input provided.");
         }
@@ -102,6 +104,7 @@ public class Parser {
             if (end.isBefore(start)) {
                 throw new SidException("Event end must be on/after start.");
             }
+            assert !end.isBefore(start) : "Event end date constraint validated";
             Event e = new Event(desc, start, end, false);
             tasks.add(e);
             ui.showTaskAdded(e, tasks.getSize());
@@ -170,6 +173,8 @@ public class Parser {
      * @param tasks Task list to operate on.
      */
     public String parseAndExecute(String input, TodoList tasks) {
+        assert input != null : "Input cannot be null";
+        assert tasks != null : "TodoList cannot be null";
         String line = input.trim();
         if (line.isEmpty()) {
             return "Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n>";
@@ -290,8 +295,12 @@ public class Parser {
     // ---- helpers ------------------------------------------------------------
 
     private int parseIndex(String s, String errorMsg) throws SidException {
+        assert s != null : "String to parse cannot be null";
+        assert errorMsg != null : "Error message cannot be null";
         try {
-            return Integer.parseInt(s.trim());
+            int result = Integer.parseInt(s.trim());
+            assert result > 0 : "Parsed task ID must be positive (1-based indexing)";
+            return result;
         } catch (NumberFormatException e) {
             throw new SidException(errorMsg);
         }

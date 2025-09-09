@@ -41,31 +41,43 @@ public class Ui {
 
     // ---------- High-level task messages (used by Parser) ----------
 
+    /** Displays the current task list. */
     public void showList(TodoList tasks) {
+        assert tasks != null : "TodoList cannot be null";
         frame("Here are your tasks:\n" + tasks.toString());
     }
 
     /** Shows confirmation that a task has been added successfully*/
     public void showTaskAdded(ToDo task, int total) {
+        assert task != null : "Task cannot be null";
+        assert total >= 0 : "Total task count must be non-negative";
         frame("Got it. I've added this task:\n  " + task
                 + "\nNow you have " + total + " tasks in the list.");
     }
 
     /** Shows confirmation that a task has been deleted successfully*/
     public void showTaskDeleted(ToDo task, int total) {
+        assert task != null : "Task cannot be null";
+        assert total >= 0 : "Total task count must be non-negative";
         frame("Successfully deleted this task:\n  " + task
                 + "\nNow you have " + total + " tasks in the list.");
     }
 
+    /** Shows confirmation that a task has been marked as done. */
     public void showTaskMarked(ToDo task) {
+        assert task != null : "Task cannot be null";
         frame("YAY! You've completed this task:\n  " + task);
     }
 
+    /** Shows confirmation that a task has been unmarked. */
     public void showTaskUnmarked(ToDo task) {
+        assert task != null : "Task cannot be null";
         frame("OK, I've marked this task as not done yet:\n  " + task);
     }
 
+    /** Displays search results. */
     public void showFind(TodoList foundTasks) {
+        assert foundTasks != null : "TodoList cannot be null";
         frame("Here are the tasks I found:\n" + foundTasks.toString());
     }
 

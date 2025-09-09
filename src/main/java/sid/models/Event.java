@@ -29,6 +29,9 @@ public class Event extends ToDo {
      */
     public Event(String description, LocalDateTime startDate, LocalDateTime endDate, boolean isDone) {
         super(description, isDone);
+        assert startDate != null : "Start date cannot be null";
+        assert endDate != null : "End date cannot be null";
+        assert !startDate.isAfter(endDate) : "Start date must be before or equal to end date";
         this.type = TaskType.EVENT;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -43,6 +46,7 @@ public class Event extends ToDo {
     }
 
     private static String format(LocalDateTime dt) {
+        assert dt != null : "DateTime to format cannot be null";
         return (dt.getHour() == 0 && dt.getMinute() == 0)
                 ? dt.toLocalDate().format(DATE_FMT)
                 : dt.format(DATE_TIME_FMT);
