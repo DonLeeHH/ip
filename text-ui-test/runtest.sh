@@ -25,7 +25,7 @@ fi
 java -classpath ../bin Sid < input.txt > ACTUAL.TXT
 
 # convert to UNIX format (fallback if dos2unix is missing)
-cp EXPECTED.TXT EXPECTED-UNIX.TXT
+cp EXPECTED.txt EXPECTED-UNIX.TXT
 if command -v dos2unix >/dev/null 2>&1; then
   dos2unix ACTUAL.TXT EXPECTED-UNIX.TXT >/dev/null 2>&1
 else
