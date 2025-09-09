@@ -89,8 +89,16 @@ public class TodoList {
      *
      * @param task - the task to be added
      */
-    public void add(ToDo task) {
+    public void add(ToDo task) throws SidException {
         assert task != null : "Cannot add null task to list";
+
+        if (task instanceof Event) {
+            List<Event> clashingEvents = detectScheduleConflicts((Event) task);
+            if (!clashingEvents.isEmpty()) {
+                throw new SidException("Scheduling conflict detected! This event overlaps with:\n"
+                        + new TodoList(new ArrayList<ToDo>(clashingEvents)).toString());
+            }
+        }
         todoList.add(task);
         assert storage != null : "Storage must be available for persistent operations";
         storage.save(this);
@@ -151,6 +159,19 @@ public class TodoList {
 
     public boolean isEmpty() {
         return this.todoList.isEmpty();
+    }
+
+    private List<Event> detectScheduleConflicts(Event newEvent) {
+        return this.todoList.stream()
+            .filter(task -> task instanceof Event)
+            .map(task -> (Event) task)
+            .filter(existingEvent -> eventsOverlap(newEvent, existingEvent))
+            .toList();
+    }
+
+    private boolean eventsOverlap(Event event1, Event event2) {
+        return event1.getStartDate().isBefore(event2.getEndDate())
+            && event2.getStartDate().isBefore(event1.getEndDate());
     }
 
     @Override
