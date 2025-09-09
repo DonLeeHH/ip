@@ -22,7 +22,7 @@ if ! javac -cp ../src/main/java -Xlint:none -d ../bin ../src/main/java/sid/*.jav
 fi
 
 # run the program, feed commands from input.txt file and redirect the output to ACTUAL.TXT
-java -classpath ../bin Sid < input.txt > ACTUAL.TXT
+java -classpath ../bin sid.Sid < input.txt > ACTUAL.TXT
 
 # convert to UNIX format (fallback if dos2unix is missing)
 cp EXPECTED.txt EXPECTED-UNIX.TXT
