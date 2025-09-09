@@ -48,6 +48,8 @@ public class Storage {
      * @param relativePath Path to save file (e.g., {@code data/sid.txt}).
      */
     public Storage(String relativePath) {
+        assert relativePath != null : "File path cannot be null";
+        assert !relativePath.trim().isEmpty() : "File path cannot be empty";
         this.file = new File(relativePath);
     }
 
@@ -91,6 +93,7 @@ public class Storage {
      * @param list The current list
      */
     public void save(TodoList list) {
+        assert list != null : "TodoList to save cannot be null";
         // Ensure ./data exists
         File parent = this.file.getParentFile();
         if (parent != null && !parent.exists()) {
@@ -152,6 +155,7 @@ public class Storage {
      * </pre>
      */
     private ToDo deserializeToDo(String line) throws SidException {
+        assert line != null : "Line to deserialize cannot be null";
         String[] parts = line.split("\\s*\\|\\s*");
         if (parts.length < 3) {
             throw new IllegalArgumentException("Too few fields");
