@@ -131,22 +131,14 @@ public class TodoList {
      * @return A TodoList of the tasks that have matched the keyword
      */
     public TodoList findTodos(String keyword) {
-        List<ToDo> results = new ArrayList<>();
         if (keyword == null || keyword.trim().isEmpty()) {
-            return new TodoList(results); // empty
+            return new TodoList(new ArrayList<ToDo>()); // empty
         }
 
         String query = keyword.trim().toLowerCase();
-        for (ToDo t : this.todoList) {
-            if ((t.getDescription() != null
-                        &&
-                    t.getDescription().toLowerCase().contains(query))
-                    || (t.toString() != null
-                        &&
-                    t.toString().toLowerCase().contains(query))) {
-                results.add(t);
-            }
-        }
+        List<ToDo> results = this.todoList.stream()
+            .filter(t -> t.toString().toLowerCase().contains(query))
+            .toList();
         return new TodoList(results);
     }
 
