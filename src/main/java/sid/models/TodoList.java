@@ -137,27 +137,15 @@ public class TodoList {
      * @return A TodoList of the tasks that have matched the keyword
      */
     public TodoList findTodos(String keyword) {
-        List<ToDo> results = new ArrayList<>();
         if (keyword == null || keyword.trim().isEmpty()) {
-            return new TodoList(results); // empty
+            return new TodoList(new ArrayList<ToDo>()); // empty
         }
 
         String query = keyword.trim().toLowerCase();
         assert !query.isEmpty() : "Query should not be empty after trimming non-empty keyword";
-        for (ToDo t : this.todoList) {
-            // Guard clause: skip if neither description nor toString contains query
-            if (t.getDescription() == null && t.toString() == null) {
-                continue;
-            }
-
-            boolean descriptionMatches = t.getDescription() != null
-                && t.getDescription().toLowerCase().contains(query);
-            boolean toStringMatches = t.toString() != null
-                && t.toString().toLowerCase().contains(query);
-            if (descriptionMatches || toStringMatches) {
-                results.add(t);
-            }
-        }
+        List<ToDo> results = this.todoList.stream()
+            .filter(t -> t.toString().toLowerCase().contains(query))
+            .toList();
         return new TodoList(results);
     }
 
