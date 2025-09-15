@@ -22,6 +22,10 @@ public class Main extends Application {
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
+            stage.setTitle("Sid - Your Todo Tracker");
+            stage.setMinHeight(400);
+            stage.setMinWidth(350);
+            stage.setResizable(true);
             fxmlLoader.<MainWindow>getController().setSid(sid); // inject the Duke instance
             stage.show();
         } catch (IOException e) {

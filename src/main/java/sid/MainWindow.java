@@ -25,12 +25,14 @@ public class MainWindow extends AnchorPane {
     private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
     private Image sidImage = new Image(this.getClass().getResourceAsStream("/images/DaSid.png"));
 
+    /** Initializes the controller and sets up responsive layout bindings. */
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        dialogContainer.prefWidthProperty().bind(scrollPane.widthProperty().subtract(5));
     }
 
-    /** Injects the Duke instance */
+    /** Injects the Sid instance */
     public void setSid(Sid s) {
         assert s != null : "Sid instance cannot be null";
         sid = s;
@@ -46,7 +48,7 @@ public class MainWindow extends AnchorPane {
     }
 
     /**
-     * Creates two dialog boxes, one echoing user input and the other containing Duke's reply and then appends them to
+     * Creates two dialog boxes, one echoing user input and the other containing Sid's reply and then appends them to
      * the dialog container. Clears the user input after processing.
      */
     @FXML
