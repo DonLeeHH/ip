@@ -44,7 +44,7 @@ public class DeleteCommandTest {
         assertEquals("Second task", result.getTask().getDescription());
         assertTrue(result.getTask().isDone());
         assertEquals(2, result.getTotalTasks());
-        assertTrue(result.getMessage().contains("Successfully deleted task:"));
+        assertTrue(result.getMessage().contains("Deleted your task:"));
         assertTrue(result.getMessage().contains("Second task"));
 
         // Verify remaining tasks shifted correctly
@@ -77,7 +77,7 @@ public class DeleteCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             deleteCommand.execute("", tasks);
         });
-        assertEquals("Usage: delete <task-number>", exception.getMessage());
+        assertEquals("What do you want me to delete?\nUsage: delete <task-number>", exception.getMessage());
         assertEquals(3, tasks.getSize()); // List unchanged
     }
 

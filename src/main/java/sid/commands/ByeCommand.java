@@ -9,6 +9,6 @@ import sid.models.TodoList;
 public class ByeCommand implements Command {
     @Override
     public CommandResult execute(String arg, TodoList tasks) throws SidException {
-        return new CommandResult(false, "Goodbye!");
+        return new CommandResult(false, "Byebye! See you next time!");
     }
 }

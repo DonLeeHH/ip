@@ -132,7 +132,7 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getSidDialog(response, sidImage)
         );
         userInput.clear();
-        if (response.equals("Goodbye!")) {
+        if (response.contains("bye!")) {
             // Create a thread to handle the delayed exit
             new Thread(() -> {
                 try {
