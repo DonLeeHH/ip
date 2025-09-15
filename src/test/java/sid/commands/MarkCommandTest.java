@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 import sid.models.ToDo;
 import sid.models.TodoList;
 import sid.stubs.StorageStub;
@@ -44,7 +45,7 @@ public class MarkCommandTest {
         assertEquals("First task", result.getTask().getDescription());
         assertTrue(result.getTask().isDone());
         assertEquals(3, result.getTotalTasks());
-        assertTrue(result.getMessage().contains("Successfully marked task number 1"));
+        assertTrue(result.getMessage().contains(ResponseMessage.MARK_SUCCESS.getMessage()));
     }
 
     @Test
@@ -62,7 +63,7 @@ public class MarkCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             markCommand.execute("", tasks);
         });
-        assertEquals("Usage: mark <task-number>", exception.getMessage());
+        assertEquals(ResponseMessage.MARK_USAGE_ERROR.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -70,7 +71,7 @@ public class MarkCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             markCommand.execute("   ", tasks);
         });
-        assertEquals("Please provide a valid number after 'mark'.", exception.getMessage());
+        assertEquals(ResponseMessage.MARK_INVALID_NUMBER.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -78,7 +79,7 @@ public class MarkCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             markCommand.execute("abc", tasks);
         });
-        assertEquals("Please provide a valid number after 'mark'.", exception.getMessage());
+        assertEquals(ResponseMessage.MARK_INVALID_NUMBER.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -100,7 +101,7 @@ public class MarkCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             markCommand.execute("10", tasks);
         });
-        assertEquals("Not a valid task number!", exception.getMessage());
+        assertEquals(ResponseMessage.INVALID_TASK_NUMBER.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -117,7 +118,7 @@ public class MarkCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             markCommand.execute("1.5", tasks);
         });
-        assertEquals("Please provide a valid number after 'mark'.", exception.getMessage());
+        assertEquals(ResponseMessage.MARK_INVALID_NUMBER.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -125,7 +126,7 @@ public class MarkCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             markCommand.execute("999", tasks);
         });
-        assertEquals("Not a valid task number!", exception.getMessage());
+        assertEquals(ResponseMessage.INVALID_TASK_NUMBER.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -135,7 +136,7 @@ public class MarkCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             markCommand.execute("1", emptyTasks);
         });
-        assertEquals("Not a valid task number!", exception.getMessage());
+        assertEquals(ResponseMessage.INVALID_TASK_NUMBER.getMessage(), exception.getMessage());
     }
 
     @Test

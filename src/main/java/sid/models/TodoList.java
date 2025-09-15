@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 import sid.storage.Storage;
 
 /**
@@ -50,7 +51,7 @@ public class TodoList {
         int i = id - 1;
 
         if (i < 0 || i >= this.getSize()) {
-            throw new SidException("Not a valid task number!");
+            throw new SidException(ResponseMessage.INVALID_TASK_NUMBER.getMessage());
         }
         assert i >= 0 && i < this.getSize() : "Index must be within valid range after validation";
         ToDo t = todoList.get(i);
@@ -71,7 +72,7 @@ public class TodoList {
         int i = id - 1;
 
         if (i < 0 || i >= this.getSize()) {
-            throw new SidException("Not a valid task number!");
+            throw new SidException(ResponseMessage.INVALID_TASK_NUMBER.getMessage());
         }
         assert i >= 0 && i < this.getSize() : "Index must be within valid range after validation";
         ToDo t = this.todoList.get(i);
@@ -113,7 +114,7 @@ public class TodoList {
     public void delete(int id) throws SidException {
         int i = id - 1;
         if (i < 0 || i >= this.getSize()) {
-            throw new SidException("Not a valid task number!");
+            throw new SidException(ResponseMessage.INVALID_TASK_NUMBER.getMessage());
         }
         assert i >= 0 && i < this.getSize() : "Index must be within valid range after validation";
         ToDo deletedTask = this.todoList.remove(i);
@@ -132,7 +133,7 @@ public class TodoList {
         // For one-based indexing
         id -= 1;
         if (id < 0 || id >= this.getSize()) {
-            throw new SidException("Not a valid task number!");
+            throw new SidException(ResponseMessage.INVALID_TASK_NUMBER.getMessage());
         }
         assert id >= 0 && id < this.getSize() : "Index must be within valid range after validation";
         return this.todoList.get(id);

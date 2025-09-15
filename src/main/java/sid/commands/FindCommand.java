@@ -1,6 +1,7 @@
 package sid.commands;
 
 import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 import sid.models.TodoList;
 
 /**
@@ -10,13 +11,13 @@ public class FindCommand implements Command {
     @Override
     public CommandResult execute(String arg, TodoList tasks) throws SidException {
         if (arg.isEmpty()) {
-            throw new SidException("Usage: find <keyword>");
+            throw new SidException(ResponseMessage.FIND_USAGE_ERROR.getMessage());
         }
         TodoList foundTodos = tasks.findTodos(arg);
         if (foundTodos.isEmpty()) {
-            return new CommandResult(true, "No tasks found", foundTodos);
+            return new CommandResult(true, ResponseMessage.FIND_NO_RESULTS.getMessage(), foundTodos);
         } else {
-            return new CommandResult(true, "Here are the tasks I found:\n" + foundTodos.toString(), foundTodos);
+            return new CommandResult(true, ResponseMessage.FIND_SUCCESS.getMessageWith(foundTodos), foundTodos);
         }
     }
 }

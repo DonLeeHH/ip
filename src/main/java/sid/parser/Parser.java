@@ -14,6 +14,7 @@ import sid.commands.MarkCommand;
 import sid.commands.TodoCommand;
 import sid.commands.UnmarkCommand;
 import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 import sid.models.TodoList;
 import sid.ui.Ui;
 
@@ -128,9 +129,7 @@ public class Parser {
 
         Command command = commands.get(cmd);
         if (command == null) {
-            throw new SidException(
-                    "Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n> | bye"
-            );
+            throw new SidException(ResponseMessage.UNKNOWN_COMMAND.getMessage());
         }
 
         return command.execute(arg, tasks);
