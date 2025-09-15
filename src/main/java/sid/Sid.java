@@ -17,7 +17,7 @@ public class Sid {
     private final Ui ui;
     private final Parser parser;
 
-    private boolean running = true;
+    private boolean isRunning = true;
 
     /**
      * Constructs the Sid application with the given save file path.
@@ -38,12 +38,12 @@ public class Sid {
         ui.showWelcome();
 
         try {
-            while (running && ui.hasNextLine()) {
+            while (isRunning && ui.hasNextLine()) {
                 String input = ui.readLine();
                 try {
                     boolean keepGoing = parser.parseAndExecute(input, todoList, ui);
                     if (!keepGoing) {
-                        running = false;
+                        isRunning = false;
                     }
                 } catch (SidException e) {
                     ui.showError(e.getMessage());
