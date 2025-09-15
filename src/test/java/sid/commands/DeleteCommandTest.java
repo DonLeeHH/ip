@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 import sid.models.ToDo;
 import sid.models.TodoList;
 import sid.stubs.StorageStub;
@@ -44,7 +45,7 @@ public class DeleteCommandTest {
         assertEquals("Second task", result.getTask().getDescription());
         assertTrue(result.getTask().isDone());
         assertEquals(2, result.getTotalTasks());
-        assertTrue(result.getMessage().contains("Deleted your task:"));
+        assertTrue(result.getMessage().contains(ResponseMessage.DELETE_SUCCESS.getMessage()));
         assertTrue(result.getMessage().contains("Second task"));
 
         // Verify remaining tasks shifted correctly
@@ -77,7 +78,7 @@ public class DeleteCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             deleteCommand.execute("", tasks);
         });
-        assertEquals("What do you want me to delete?\nUsage: delete <task-number>", exception.getMessage());
+        assertEquals(ResponseMessage.DELETE_USAGE_ERROR.getMessage(), exception.getMessage());
         assertEquals(3, tasks.getSize()); // List unchanged
     }
 
@@ -86,7 +87,7 @@ public class DeleteCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             deleteCommand.execute("   ", tasks);
         });
-        assertEquals("Please provide a valid number after 'delete'.", exception.getMessage());
+        assertEquals(ResponseMessage.DELETE_INVALID_NUMBER.getMessage(), exception.getMessage());
         assertEquals(3, tasks.getSize()); // List unchanged
     }
 
@@ -95,7 +96,7 @@ public class DeleteCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             deleteCommand.execute("abc", tasks);
         });
-        assertEquals("Please provide a valid number after 'delete'.", exception.getMessage());
+        assertEquals(ResponseMessage.DELETE_INVALID_NUMBER.getMessage(), exception.getMessage());
         assertEquals(3, tasks.getSize()); // List unchanged
     }
 
@@ -120,7 +121,7 @@ public class DeleteCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             deleteCommand.execute("10", tasks);
         });
-        assertEquals("Not a valid task number!", exception.getMessage());
+        assertEquals(ResponseMessage.INVALID_TASK_NUMBER.getMessage(), exception.getMessage());
         assertEquals(3, tasks.getSize()); // List unchanged
     }
 
@@ -153,7 +154,7 @@ public class DeleteCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             deleteCommand.execute("1", emptyTasks);
         });
-        assertEquals("Not a valid task number!", exception.getMessage());
+        assertEquals(ResponseMessage.INVALID_TASK_NUMBER.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -173,7 +174,7 @@ public class DeleteCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             deleteCommand.execute("1.5", tasks);
         });
-        assertEquals("Please provide a valid number after 'delete'.", exception.getMessage());
+        assertEquals(ResponseMessage.DELETE_INVALID_NUMBER.getMessage(), exception.getMessage());
         assertEquals(3, tasks.getSize()); // List unchanged
     }
 }

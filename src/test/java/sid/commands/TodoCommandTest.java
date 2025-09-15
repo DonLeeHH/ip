@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 import sid.models.TodoList;
 import sid.stubs.StorageStub;
 
@@ -40,8 +41,7 @@ public class TodoCommandTest {
         assertFalse(tasks.getTodo(1).isDone());
         assertEquals("Buy groceries", result.getTask().getDescription());
         assertEquals(1, result.getTotalTasks());
-        assertTrue(result.getMessage().contains("Successfully added"));
-        assertTrue(result.getMessage().contains("Todo:"));
+        assertTrue(result.getMessage().contains(ResponseMessage.TODO_SUCCESS.getMessage()));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class TodoCommandTest {
         SidException exception = assertThrows(SidException.class, () -> {
             todoCommand.execute("", tasks);
         });
-        assertEquals("Usage: todo <description>", exception.getMessage());
+        assertEquals(ResponseMessage.TODO_USAGE_ERROR.getMessage(), exception.getMessage());
         assertEquals(0, tasks.getSize());
     }
 
@@ -138,8 +138,7 @@ public class TodoCommandTest {
     public void execute_resultMessageFormat_correctFormat() throws SidException {
         CommandResult result = todoCommand.execute("Test task", tasks);
 
-        String expectedPrefix = "Successfully added\nTodo: ";
-        assertTrue(result.getMessage().startsWith(expectedPrefix));
+        assertTrue(result.getMessage().startsWith(ResponseMessage.TODO_SUCCESS.getMessage()));
         assertTrue(result.getMessage().contains("[T][ ] Test task"));
     }
 }

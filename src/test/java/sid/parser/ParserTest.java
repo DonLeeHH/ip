@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 import sid.models.TodoList;
 import sid.stubs.StorageStub;
 import sid.stubs.UiStub;
@@ -66,8 +67,7 @@ public class ParserTest {
         SidException exception = assertThrows(SidException.class, () -> {
             parser.parseAndExecute("unknown", tasks, ui);
         });
-        assertEquals("Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n> | bye",
-                exception.getMessage());
+        assertEquals(ResponseMessage.UNKNOWN_COMMAND.getMessage(), exception.getMessage());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class ParserTest {
     public void parseAndExecuteJavaFX_validTodoCommand_returnsSuccessMessage() {
         String result = parser.parseAndExecute("todo test task", tasks);
 
-        assertTrue(result.contains("Successfully added"));
+        assertTrue(result.contains(ResponseMessage.TODO_SUCCESS.getMessage()));
         assertEquals(1, tasks.getSize());
     }
 
@@ -145,15 +145,14 @@ public class ParserTest {
     public void parseAndExecuteJavaFX_unknownCommand_returnsErrorMessage() {
         String result = parser.parseAndExecute("unknown", tasks);
 
-        assertEquals("Unknown command. Try: todo | deadline | event | list | mark <n> | unmark <n> | delete <n> | bye",
-                result);
+        assertEquals(ResponseMessage.UNKNOWN_COMMAND.getMessage(), result);
     }
 
     @Test
     public void parseAndExecuteJavaFX_invalidCommandArguments_returnsErrorMessage() {
         String result = parser.parseAndExecute("todo", tasks);
 
-        assertEquals("Usage: todo <description>", result);
+        assertEquals(ResponseMessage.TODO_USAGE_ERROR.getMessage(), result);
     }
 
     @Test
