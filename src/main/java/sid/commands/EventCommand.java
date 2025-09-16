@@ -29,10 +29,6 @@ public class EventCommand implements Command {
         }
         LocalDateTime start = DateTimeParser.parseFlexibleDateTime(b[0].trim());
         LocalDateTime end = DateTimeParser.parseFlexibleDateTime(b[1].trim());
-        if (end.isBefore(start)) {
-            throw new SidException(ResponseMessage.EVENT_INVALID_TIME_ORDER.getMessage());
-        }
-        assert !end.isBefore(start) : "Event end date constraint validated";
         Event e = new Event(desc, start, end, false);
         tasks.add(e);
         return new CommandResult(true, ResponseMessage.EVENT_SUCCESS.getMessageWith(e), e, tasks.getSize());

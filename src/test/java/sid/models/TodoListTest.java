@@ -96,16 +96,18 @@ class TodoListTest {
     @Test
     void findTodos_matchesAgainstToString_forDateBasedTasks() throws Exception {
         // Include a Deadline so the formatted date appears in toString()
-        LocalDateTime dt = LocalDateTime.of(2025, 8, 30, 18, 0);
+        LocalDateTime dt = LocalDateTime.now().plusDays(30).withHour(18).withMinute(0).withSecond(0).withNano(0);
         TodoList list = new TodoList(List.of(
                 new ToDo("alpha", false),
-                new Deadline("return book", dt, false) // toString contains "Aug 30 2025 18:00"
+                new Deadline("return book", dt, false)
         ));
 
-        TodoList results = list.findTodos("Aug 30 2025 18:00");
+        // Search for the formatted date string that would actually be generated
+        String expectedDateFormat = dt.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd yyyy HH:mm"));
+        TodoList results = list.findTodos(expectedDateFormat);
         assertNotNull(results);
         assertEquals(1, results.getSize());
-        assertTrue(results.getTodo(1).toString().contains("(by: Aug 30 2025 18:00)"));
+        assertTrue(results.getTodo(1).toString().contains("(by: " + expectedDateFormat + ")"));
     }
 
     @Test
@@ -151,7 +153,7 @@ class TodoListTest {
 
         // Adding non-Event tasks should never trigger conflict detection
         list.add(new ToDo("task1", false));
-        list.add(new Deadline("deadline1", LocalDateTime.now(), false));
+        list.add(new Deadline("deadline1", LocalDateTime.now().plusDays(1), false));
 
         assertEquals(2, list.getSize());
         assertEquals(2, storage.getSaveCalls());
@@ -164,11 +166,11 @@ class TodoListTest {
 
         // Non-overlapping events should be added successfully
         Event event1 = new Event("Meeting A",
-            LocalDateTime.of(2025, 1, 1, 9, 0),
-            LocalDateTime.of(2025, 1, 1, 10, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(9).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0), false);
         Event event2 = new Event("Meeting B",
-            LocalDateTime.of(2025, 1, 1, 11, 0),
-            LocalDateTime.of(2025, 1, 1, 12, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(11).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(12).withMinute(0).withSecond(0).withNano(0), false);
 
         list.add(event1);
         list.add(event2);
@@ -184,14 +186,14 @@ class TodoListTest {
 
         // Add first event
         Event event1 = new Event("Meeting A",
-            LocalDateTime.of(2025, 1, 1, 9, 0),
-            LocalDateTime.of(2025, 1, 1, 11, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(9).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(11).withMinute(0).withSecond(0).withNano(0), false);
         list.add(event1);
 
         // Try to add completely overlapping event
         Event event2 = new Event("Meeting B",
-            LocalDateTime.of(2025, 1, 1, 9, 30),
-            LocalDateTime.of(2025, 1, 1, 10, 30), false);
+            LocalDateTime.now().plusDays(10).withHour(9).withMinute(30).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(30).withSecond(0).withNano(0), false);
 
         SidException exception = assertThrows(SidException.class, () -> list.add(event2));
         assertTrue(exception.getMessage().contains("Scheduling conflict detected!"));
@@ -208,14 +210,14 @@ class TodoListTest {
 
         // Add first event: 9:00-11:00
         Event event1 = new Event("Morning Meeting",
-            LocalDateTime.of(2025, 1, 1, 9, 0),
-            LocalDateTime.of(2025, 1, 1, 11, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(9).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(11).withMinute(0).withSecond(0).withNano(0), false);
         list.add(event1);
 
         // Try to add partially overlapping event: 10:30-12:30
         Event event2 = new Event("Lunch Meeting",
-            LocalDateTime.of(2025, 1, 1, 10, 30),
-            LocalDateTime.of(2025, 1, 1, 12, 30), false);
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(30).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(12).withMinute(30).withSecond(0).withNano(0), false);
 
         SidException exception = assertThrows(SidException.class, () -> list.add(event2));
         assertTrue(exception.getMessage().contains("Scheduling conflict detected!"));
@@ -229,15 +231,15 @@ class TodoListTest {
 
         // Add first event: 9:00-10:00
         Event event1 = new Event("Meeting A",
-            LocalDateTime.of(2025, 1, 1, 9, 0),
-            LocalDateTime.of(2025, 1, 1, 10, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(9).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0), false);
         list.add(event1);
 
         // Try to add event that starts exactly when first ends: 10:00-11:00
         // This should NOT conflict (end time is exclusive)
         Event event2 = new Event("Meeting B",
-            LocalDateTime.of(2025, 1, 1, 10, 0),
-            LocalDateTime.of(2025, 1, 1, 11, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(11).withMinute(0).withSecond(0).withNano(0), false);
 
         // This should succeed - events that touch at endpoints don't conflict
         list.add(event2);
@@ -251,14 +253,14 @@ class TodoListTest {
 
         // Add multiple existing events
         Event event1 = new Event("Meeting A",
-            LocalDateTime.of(2025, 1, 1, 9, 0),
-            LocalDateTime.of(2025, 1, 1, 10, 30), false);
+            LocalDateTime.now().plusDays(10).withHour(9).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(30).withSecond(0).withNano(0), false);
         Event event2 = new Event("Meeting B",
-            LocalDateTime.of(2025, 1, 1, 11, 0),
-            LocalDateTime.of(2025, 1, 1, 12, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(11).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(12).withMinute(0).withSecond(0).withNano(0), false);
         Event event3 = new Event("Meeting C",
-            LocalDateTime.of(2025, 1, 1, 14, 0),
-            LocalDateTime.of(2025, 1, 1, 15, 0), false);
+            LocalDateTime.now().plusDays(10).withHour(14).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(15).withMinute(0).withSecond(0).withNano(0), false);
 
         list.add(event1);
         list.add(event2);
@@ -266,8 +268,8 @@ class TodoListTest {
 
         // Try to add event that conflicts with multiple events: 10:00-14:30
         Event conflictingEvent = new Event("Long Meeting",
-            LocalDateTime.of(2025, 1, 1, 10, 0),
-            LocalDateTime.of(2025, 1, 1, 14, 30), false);
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(14).withMinute(30).withSecond(0).withNano(0), false);
 
         SidException exception = assertThrows(SidException.class, () -> list.add(conflictingEvent));
         assertTrue(exception.getMessage().contains("Scheduling conflict detected!"));
@@ -284,11 +286,11 @@ class TodoListTest {
 
         // Events with same times but different days should not conflict
         Event event1 = new Event("Monday Meeting",
-            LocalDateTime.of(2025, 1, 6, 9, 0),
-            LocalDateTime.of(2025, 1, 6, 10, 0), false);
+            LocalDateTime.now().plusDays(15).withHour(9).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(15).withHour(10).withMinute(0).withSecond(0).withNano(0), false);
         Event event2 = new Event("Tuesday Meeting",
-            LocalDateTime.of(2025, 1, 7, 9, 0),
-            LocalDateTime.of(2025, 1, 7, 10, 0), false);
+            LocalDateTime.now().plusDays(16).withHour(9).withMinute(0).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(16).withHour(10).withMinute(0).withSecond(0).withNano(0), false);
 
         list.add(event1);
         list.add(event2);
@@ -303,12 +305,12 @@ class TodoListTest {
 
         // Add mixed task types
         list.add(new ToDo("Regular task", false));
-        list.add(new Deadline("Deadline task", LocalDateTime.of(2025, 1, 1, 10, 0), false));
+        list.add(new Deadline("Deadline task", LocalDateTime.now().plusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0), false));
 
         // Add event that would overlap with deadline time - should not conflict
         Event event = new Event("Meeting",
-            LocalDateTime.of(2025, 1, 1, 9, 30),
-            LocalDateTime.of(2025, 1, 1, 10, 30), false);
+            LocalDateTime.now().plusDays(10).withHour(9).withMinute(30).withSecond(0).withNano(0),
+            LocalDateTime.now().plusDays(10).withHour(10).withMinute(30).withSecond(0).withNano(0), false);
 
         list.add(event); // Should succeed
         assertEquals(3, list.getSize());
