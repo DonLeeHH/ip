@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import sid.enums.TaskType;
+import sid.exceptions.SidException;
+import sid.messages.ResponseMessage;
 
 /**
  * Represents a task with a due date/time.
@@ -23,12 +25,26 @@ public class Deadline extends ToDo {
      * @param description Description of the task.
      * @param dueDate     Due date/time.
      * @param isDone      Completion flag.
+     * @throws SidException If the due date is in the past.
      */
-    public Deadline(String description, LocalDateTime dueDate, boolean isDone) {
+    public Deadline(String description, LocalDateTime dueDate, boolean isDone) throws SidException {
         super(description, isDone);
         assert dueDate != null : "Due date cannot be null";
+        checkNotPastDate(dueDate);
         this.dueDate = dueDate;
         this.type = TaskType.DEADLINE;
+    }
+
+    /**
+     * Validates that the given date/time is not in the past.
+     *
+     * @param dateTime The date/time to validate.
+     * @throws SidException If the date/time is in the past.
+     */
+    private static void checkNotPastDate(LocalDateTime dateTime) throws SidException {
+        if (dateTime.isBefore(LocalDateTime.now())) {
+            throw new SidException(ResponseMessage.DEADLINE_PAST_DATE.getMessage());
+        }
     }
 
     /**

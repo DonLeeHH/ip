@@ -32,10 +32,12 @@ public enum ResponseMessage {
     EVENT_SUCCESS("Got it! I've blocked out this time for you:\n"),
     EVENT_USAGE_ERROR("Usage: event <description> /from <yyyy-MM-dd[ HHmm]> /to <yyyy-MM-dd HHmm>"),
     EVENT_INVALID_TIME_ORDER("Event end must be on/after start."),
+    EVENT_PAST_DATE("That datetime doesn't make sense, unless you can timetravel o.o"),
 
     // Deadline command messages
     DEADLINE_SUCCESS("Successfully added\nDeadline: "),
     DEADLINE_USAGE_ERROR("You typed it wrong!\nProper usage: deadline <description> /by <yyyy-MM-dd HHmm>"),
+    DEADLINE_PAST_DATE("That datetime doesn't make sense, unless you can timetravel o.o"),
 
     // Find command messages
     FIND_SUCCESS("Found some matches! Here's what I dug up:\n"),
