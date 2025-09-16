@@ -305,7 +305,8 @@ class TodoListTest {
 
         // Add mixed task types
         list.add(new ToDo("Regular task", false));
-        list.add(new Deadline("Deadline task", LocalDateTime.now().plusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0), false));
+        list.add(new Deadline("Deadline task",
+                LocalDateTime.now().plusDays(10).withHour(10).withMinute(0).withSecond(0).withNano(0), false));
 
         // Add event that would overlap with deadline time - should not conflict
         Event event = new Event("Meeting",

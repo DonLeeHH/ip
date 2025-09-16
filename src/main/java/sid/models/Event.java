@@ -30,7 +30,8 @@ public class Event extends ToDo {
      * @param isDone      Completion flag.
      * @throws SidException If the start date is in the past or end date is before start date.
      */
-    public Event(String description, LocalDateTime startDate, LocalDateTime endDate, boolean isDone) throws SidException {
+    public Event(String description, LocalDateTime startDate, LocalDateTime endDate, boolean isDone)
+            throws SidException {
         super(description, isDone);
         assert startDate != null : "Start date cannot be null";
         assert endDate != null : "End date cannot be null";
