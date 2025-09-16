@@ -6,7 +6,7 @@ import sid.enums.TaskType;
  * Represents a basic to-do task with a description and completion state.
  *
  * <p>The default task {@link #type} is {@link TaskType#TODO}. Instances can be marked
- * done/undone and are rendered in a Duke-style format, e.g.,
+ * done/undone and are rendered in a Sid-style format, e.g.,
  * {@code [T][ ] read book} or {@code [T][X] read book}.
  */
 public class ToDo {

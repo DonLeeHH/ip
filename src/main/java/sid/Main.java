@@ -9,7 +9,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 /**
- * A GUI for Duke using FXML.
+ * A GUI for Sid using FXML.
  */
 public class Main extends Application {
 
@@ -26,7 +26,7 @@ public class Main extends Application {
             stage.setMinHeight(400);
             stage.setMinWidth(350);
             stage.setResizable(true);
-            fxmlLoader.<MainWindow>getController().setSid(sid); // inject the Duke instance
+            fxmlLoader.<MainWindow>getController().setSid(sid); // inject the Sid instance
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
