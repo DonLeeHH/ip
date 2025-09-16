@@ -44,8 +44,12 @@ public class DialogBox extends HBox {
 
     /**
      * Makes the profile picture circular by applying a circular clip.
+     * Centers the image properly to fill the circular area.
      */
     private void makeImageCircular() {
+        // Set the image to fill the entire ImageView area without preserving ratio
+        displayPicture.setPreserveRatio(false);
+
         double radius = Math.min(displayPicture.getFitWidth(), displayPicture.getFitHeight()) / 2;
         Circle clip = new Circle(radius);
         clip.setCenterX(displayPicture.getFitWidth() / 2);
